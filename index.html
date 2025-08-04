@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tom Harrysson - Medical Student</title>
+    <title>Your Name - Medical Student</title>
     <style>
         * {
             margin: 0;
@@ -37,7 +37,10 @@
         .header {
             text-align: center;
             padding: 60px 20px;
-            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(52, 73, 94, 0.8));
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(52, 73, 94, 0.8)), url('your-photo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: white;
             position: relative;
         }
@@ -217,11 +220,11 @@
             .nav-tabs {
                 flex-direction: column;
             }
-
+            
             .header h1 {
                 font-size: 2rem;
             }
-
+            
             .tab-content {
                 padding: 20px;
             }
@@ -234,7 +237,7 @@
             <div class="header">
                 <div class="header-content">
                     <h1>Tom Harrysson</h1>
-                    <p>2<sup>nd</sup> Year Doctor of Medicine and Surgery (MChD) Student</p>
+                    <p>Second Year Doctor of Medicine and Surgery (MChD) Student</p>
                 </div>
             </div>
 
@@ -249,8 +252,9 @@
                 <div id="about" class="tab-pane active">
                     <h2 class="section-title">About Me</h2>
                     <p style="font-size: 1.1rem; margin-bottom: 20px;">
-                        I am a 2<sup>nd</sup>-year Doctor of Medicine and Surgery (MChD) student at The Australian National University, with a strong foundation in health sciences and practical healthcare experience. I am particularly interested in cardiovascular medicine, surgery, perioperative medicine and the application of AI in clinical practice.
+                        I am a second-year Doctor of Medicine and Surgery (MChD) student at The Australian National University, with a strong foundation in health sciences and practical healthcare experience. I am particularly interested in cardiovascular medicine, surgery, perioperative medicine and the application of AI in clinical practice.
                     </p>
+                    
                     <div class="skills-grid">
                         <div class="skill-category">
                             <h4>Languages</h4>
@@ -265,21 +269,90 @@
 
                 <div id="education" class="tab-pane">
                     <h2 class="section-title">Education & Background</h2>
+                    
                     <div class="education-item">
                         <h3>Doctor of Medicine and Surgery (MChD)</h3>
                         <div class="date">January 2024 - December 2027 | The Australian National University</div>
-                        <p>Currently in 2<sup>nd</sup> year of medical degree program. Gaining comprehensive understanding of human anatomy, physiology, pathology, and clinical medicine.</p>
+                        <p>Currently in second year of medical degree program. Gaining comprehensive understanding of human anatomy, physiology, pathology, and clinical medicine.</p>
                     </div>
-                    <!-- Add other education/work experience here (omitted for brevity) -->
+
+                    <div class="education-item">
+                        <h3>Bachelor of Health Science</h3>
+                        <div class="date">February 2021 - December 2023 | The Australian National University</div>
+                        <p>Comprehensive foundation in health sciences with focus on preparing for medical school entrance and understanding healthcare systems.</p>
+                    </div>
+
+                    <div class="education-item">
+                        <h3>Work Experience</h3>
+                        <div class="date">Current & Previous Roles</div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 25px; margin-top: 15px;">
+                            <div style="background: white; padding: 25px; border-radius: 12px; border-left: 4px solid #8b7355; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="margin: 0; color: #2c3e50; font-size: 1.1rem; font-weight: 600;">Health Service Officer</h4>
+                                    <span style="background: #f8f4f0; color: #8b7355; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; white-space: nowrap;">November 2024 - Present</span>
+                                </div>
+                                <p style="margin: 0 0 12px 0; font-size: 0.95rem; color: #495057; font-weight: 500;">Canberra Health Services</p>
+                                <ul style="margin: 0; padding-left: 18px; color: #6c757d; line-height: 1.6;">
+                                    <li>Theatre Resource Team member responsible for surgical equipment preparation</li>
+                                    <li>Equipment setup and maintenance for elective and emergency procedures</li>
+                                    <li>Handling and processing of reusable medical devices (RMDs)</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: white; padding: 25px; border-radius: 12px; border-left: 4px solid #8b7355; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="margin: 0; color: #2c3e50; font-size: 1.1rem; font-weight: 600;">Wardsperson</h4>
+                                    <span style="background: #f8f4f0; color: #8b7355; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; white-space: nowrap;">February - November 2024</span>
+                                </div>
+                                <p style="margin: 0 0 12px 0; font-size: 0.95rem; color: #495057; font-weight: 500;">Barton Private Hospital</p>
+                                <ul style="margin: 0; padding-left: 18px; color: #6c757d; line-height: 1.6;">
+                                    <li>Operating theatre preparation and equipment setup across multiple specialties</li>
+                                    <li>Patient positioning and assistance during surgical procedures</li>
+                                    <li>Support for Orthopaedics, Plastics, Urology, Gynaecology, and Pain Medicine cases</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: white; padding: 25px; border-radius: 12px; border-left: 4px solid #8b7355; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <h4 style="margin: 0; color: #2c3e50; font-size: 1.1rem; font-weight: 600;">Dispensary Technician</h4>
+                                    <span style="background: #f8f4f0; color: #8b7355; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; white-space: nowrap;">August 2019 - January 2024</span>
+                                </div>
+                                <p style="margin: 0 0 12px 0; font-size: 0.95rem; color: #495057; font-weight: 500;">Capital Chemist Curtin</p>
+                                <ul style="margin: 0; padding-left: 18px; color: #6c757d; line-height: 1.6;">
+                                    <li>Medication dispensing using FRED Dispense pharmacy system</li>
+                                    <li>Patient consultation and medication counseling</li>
+                                    <li>Webster-pak medication packaging and compliance aids</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="research" class="tab-pane">
                     <h2 class="section-title">Research Projects</h2>
-                    <!-- Research projects already included earlier -->
+                    
+                    <div class="research-item">
+                        <h3>Chemical VTE Prophylaxis Audit: A retrospective review of ICU patients with confirmed PE in 2023 <span class="research-status status-ongoing">Ongoing</span></h3>
+                        <div class="date">July 2024 - September 2025 | The Canberra Hospital</div>
+                        <p><strong>Supervisors:</strong> Dr Karlee Johnston, PhD, B. Pharm, M. ClinPharm; Gráinne Hughes, M. Pharm, PGDipClinPharm</p>
+                        <p><strong>Objective:</strong> Retrospective audit examining chemical venous thromboembolism prophylaxis practices in ICU patients who developed confirmed pulmonary embolism during 2023.</p>
+                        <p><strong>My Role:</strong> Data collection, chart review, analysis of prophylaxis protocols and patient outcomes.</p>
+                    </div>
+
+                    <div class="research-item">
+                        <h3>Incidents and Mechanisms of Geriatric Trauma treated at the Canberra Hospital <span class="research-status status-completed">Completed</span></h3>
+                        <div class="date">November 2024 - February 2025 | The Canberra Hospital</div>
+                        <p><strong>Supervisors:</strong> Rebecca Brown, RN; Dr Joe Lynch, PhD</p>
+                        <p><strong>Objective:</strong> Analysis of geriatric trauma cases to identify common injury patterns, mechanisms, and outcomes in elderly patients presenting to The Canberra Hospital.</p>
+                        <p><strong>My Role:</strong> Statistical analysis and identification of trends in geriatric trauma presentations.</p>
+                        <p><strong>Presentation:</strong> Presented at Canberra Health Annual Research Meeting (CHARM) 2025.</p>
+                    </div>
                 </div>
 
                 <div id="contact" class="tab-pane">
                     <h2 class="section-title">Contact Information</h2>
+                    
                     <div class="contact-info">
                         <div class="contact-item">
                             <strong>Email</strong>
@@ -294,6 +367,7 @@
                             Canberra, Australian Capital Territory, Australia
                         </div>
                     </div>
+                    
                     <div style="margin-top: 30px; text-align: center; color: #6c757d;">
                         <p>Feel free to reach out for collaboration opportunities, research discussions, or professional networking.</p>
                     </div>
@@ -305,14 +379,20 @@
     <script>
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
+            
+            // Hide all tab content
             tabcontent = document.getElementsByClassName("tab-pane");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].classList.remove("active");
             }
+            
+            // Remove active class from all tab buttons
             tablinks = document.getElementsByClassName("tab-button");
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].classList.remove("active");
             }
+            
+            // Show the selected tab and mark button as active
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
