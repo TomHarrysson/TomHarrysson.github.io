@@ -36,9 +36,23 @@
 
         .header {
             text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #2c3e50, #34495e);
+            padding: 60px 20px;
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(52, 73, 94, 0.8)), url('Medical School Badge Photo - Tom Harrysson - u7281544.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: white;
+            position: relative;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px 40px;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: #2c3e50;
         }
 
         .header h1 {
@@ -221,8 +235,10 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <h1>Tom Harrysson</h1>
-                <p>2nd Year Doctor of Medicine and Surgery (MChD) Student</p>
+                <div class="header-content">
+                    <h1>Tom Harrysson</h1>
+                    <p>2nd Year Doctor of Medicine and Surgery (MChD) Student</p>
+                </div>
             </div>
 
             <div class="nav-tabs">
