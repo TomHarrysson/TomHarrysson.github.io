@@ -216,68 +216,6 @@
             color: #721c24;
         }
 
-        /* Ideas Section Styling */
-        .ideas-list {
-            margin-top: 24px;
-            padding-left: 0;
-            list-style-type: none;
-        }
-        .idea-item {
-            background: #faf9f7;
-            border-left: 4px solid #764ba2;
-            border-radius: 10px;
-            margin-bottom: 18px;
-            padding: 18px 22px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .idea-title {
-            font-size: 1.15rem;
-            color: #2c3e50;
-            font-weight: 600;
-            margin-bottom: 7px;
-        }
-        .idea-desc {
-            color: #495057;
-            font-size: 1rem;
-        }
-        .idea-form {
-            margin-top: 28px;
-            background: #f8f9fa;
-            padding: 22px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        }
-        .idea-form label {
-            font-weight: 500;
-            color: #2c3e50;
-            display: block;
-            margin-bottom: 7px;
-        }
-        .idea-form input, .idea-form textarea {
-            width: 100%;
-            padding: 9px 12px;
-            margin-bottom: 16px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 1rem;
-            background: #fff;
-            font-family: inherit;
-        }
-        .idea-form button {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #fff;
-            border: none;
-            padding: 11px 22px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .idea-form button:hover {
-            background: linear-gradient(135deg, #5a67d8, #6c3483);
-        }
-
         @media (max-width: 768px) {
             .nav-tabs {
                 flex-direction: column;
@@ -307,7 +245,6 @@
                 <button class="tab-button active" onclick="openTab(event, 'about')">About Me</button>
                 <button class="tab-button" onclick="openTab(event, 'education')">Education & Background</button>
                 <button class="tab-button" onclick="openTab(event, 'research')">Research Projects</button>
-                <button class="tab-button" onclick="openTab(event, 'ideas')">Ideas</button>
                 <button class="tab-button" onclick="openTab(event, 'contact')">Contact</button>
             </div>
 
@@ -396,18 +333,18 @@
                     <h2 class="section-title">Research Projects</h2>
                     
                     <div class="research-item">
-                        <h3>Chemical VTE Prophylaxis Audit: A retrospective review of ICU patients with confirmed PE in 2023 <span class="research-status status-ongoing">Ongoing</span></h3>
-                        <div class="date">July 2024 - September 2025 | The Canberra Hospital</div>
-                        <p><strong>Supervisors:</strong> Dr Karlee Johnston, PhD, B. Pharm, M. ClinPharm; Gráinne Hughes, M. Pharm, PGDipClinPharm</p>
-                        <p><strong>Objective:</strong> Retrospective audit examining chemical venous thromboembolism prophylaxis practices in ICU patients who developed confirmed pulmonary embolism during admission in 2023.</p>
-                        <p><strong>My Role:</strong> Data collection, chart review, analysis of prophylaxis protocols and patient outcomes.</p>
-                    </div>
-
-                    <div class="research-item">
                         <h3>Audit on use of Pre-Operative TOE for AF Ablation procedures <span class="research-status status-ongoing">Ongoing</span></h3>
                         <div class="date">August 2025 - Present | The Canberra Hospital</div>
                         <p><strong>Supervisors:</strong> Dr Dibbendhu Kharna, Dr Anupam Rao, and Thy Vuong</p>
                         <p><strong>Objective:</strong> Audit examining the utilization and outcomes of pre-operative transesophageal echocardiography (TOE) in atrial fibrillation ablation procedures at The Canberra Hospital.</p>
+                    </div>
+
+                    <div class="research-item">
+                        <h3>Chemical VTE Prophylaxis Audit: A retrospective review of ICU patients with confirmed PE in 2023 <span class="research-status status-completed">Completed</span></h3>
+                        <div class="date">July 2024 - September 2025 | The Canberra Hospital</div>
+                        <p><strong>Supervisors:</strong> Dr Karlee Johnston, PhD, B. Pharm, M. ClinPharm; Gráinne Hughes, M. Pharm, PGDipClinPharm</p>
+                        <p><strong>Objective:</strong> Retrospective audit examining chemical venous thromboembolism prophylaxis practices in ICU patients who developed confirmed pulmonary embolism during admission in 2023.</p>
+                        <p><strong>My Role:</strong> Data collection, chart review, analysis of prophylaxis protocols and patient outcomes.</p>
                     </div>
 
                     <div class="research-item">
@@ -418,23 +355,6 @@
                         <p><strong>My Role:</strong> Statistical analysis and identification of trends in geriatric trauma presentations.</p>
                         <p><strong>Presentation:</strong> Presented at Canberra Health Annual Research Meeting (CHARM) 2025.</p>
                     </div>
-                </div>
-
-                <div id="ideas" class="tab-pane">
-                    <h2 class="section-title">Ideas</h2>
-                    <ul class="ideas-list" id="ideasList">
-                        <!-- No ideas yet -->
-                    </ul>
-
-                    <form class="idea-form" id="ideaForm">
-                        <label for="ideaTitle">Idea Title</label>
-                        <input type="text" id="ideaTitle" name="ideaTitle" placeholder="Enter your idea's title" required>
-
-                        <label for="ideaDesc">Description</label>
-                        <textarea id="ideaDesc" name="ideaDesc" rows="3" placeholder="Describe your idea..." required></textarea>
-
-                        <button type="submit">Add Idea</button>
-                    </form>
                 </div>
 
                 <div id="contact" class="tab-pane">
@@ -483,37 +403,6 @@
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
-
-        // Add idea functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            var ideaForm = document.getElementById('ideaForm');
-            var ideasList = document.getElementById('ideasList');
-
-            if (ideaForm) {
-                ideaForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var title = document.getElementById('ideaTitle').value.trim();
-                    var desc = document.getElementById('ideaDesc').value.trim();
-
-                    if (title && desc) {
-                        var li = document.createElement('li');
-                        li.className = 'idea-item';
-                        li.innerHTML = '<div class="idea-title">' + escapeHTML(title) + '</div>' +
-                                       '<div class="idea-desc">' + escapeHTML(desc) + '</div>';
-                        ideasList.appendChild(li);
-
-                        // Clear fields
-                        ideaForm.reset();
-                    }
-                });
-            }
-
-            function escapeHTML(str) {
-                var div = document.createElement('div');
-                div.appendChild(document.createTextNode(str));
-                return div.innerHTML;
-            }
-        });
     </script>
 </body>
 </html>
