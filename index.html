@@ -5,6 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tom Harrysson - Medical Student</title>
     <style>
+        :root {
+            /* Light mode colors - Subtle medical theme with soft teals */
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #cbd5e1;
+            --bg-gradient-end: #94a3b8;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --header-overlay: rgba(30, 41, 59, 0.85);
+            --header-content-bg: rgba(255, 255, 255, 0.98);
+            --header-content-text: #1e293b;
+            --section-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --accent-primary: #0891b2;
+            --accent-secondary: #06b6d4;
+            --work-accent: #0e7490;
+            --work-bg: #f0f9ff;
+            --link-color: #0891b2;
+        }
+
+        body.dark-mode {
+            /* Dark mode colors - High contrast deep ocean theme */
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-mid: #1e293b;
+            --bg-gradient-end: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --card-bg: rgba(51, 65, 85, 0.95);
+            --header-overlay: rgba(15, 23, 42, 0.95);
+            --header-content-bg: rgba(51, 65, 85, 0.98);
+            --header-content-text: #f8fafc;
+            --section-bg: #475569;
+            --border-color: #64748b;
+            --accent-primary: #06b6d4;
+            --accent-secondary: #22d3ee;
+            --work-accent: #0ea5e9;
+            --work-bg: #334155;
+            --link-color: #22d3ee;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,9 +56,10 @@
         body {
             font-family: 'Georgia', serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #faf9f7 0%, #f0efe9 50%, #e8e6df 100%);
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -26,33 +69,36 @@
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--card-bg);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-bottom: 20px;
+            transition: background 0.3s ease;
         }
 
         .header {
             text-align: center;
             padding: 60px 20px;
-            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(52, 73, 94, 0.8)), url('your-photo.jpg');
+            background: linear-gradient(var(--header-overlay), var(--header-overlay)), url('your-photo.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             color: white;
             position: relative;
+            transition: background 0.3s ease;
         }
 
         .header-content {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--header-content-bg);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px 40px;
             display: inline-block;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            color: #2c3e50;
+            color: var(--header-content-text);
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .header h1 {
@@ -68,8 +114,9 @@
 
         .nav-tabs {
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            background: var(--section-bg);
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .tab-button {
@@ -80,19 +127,19 @@
             cursor: pointer;
             font-size: 1rem;
             font-weight: 500;
-            color: #495057;
+            color: var(--text-secondary);
             transition: all 0.3s ease;
             position: relative;
         }
 
         .tab-button:hover {
-            background: #e9ecef;
-            color: #2c3e50;
+            background: var(--border-color);
+            color: var(--header-content-text);
         }
 
         .tab-button.active {
-            background: white;
-            color: #2c3e50;
+            background: var(--card-bg);
+            color: var(--header-content-text);
             font-weight: 600;
         }
 
@@ -103,7 +150,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
         }
 
         .tab-content {
@@ -127,29 +174,33 @@
 
         .section-title {
             font-size: 1.8rem;
-            color: #2c3e50;
+            color: var(--header-content-text);
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid var(--accent-primary);
+            transition: color 0.3s ease, border-color 0.3s ease;
         }
 
         .education-item, .research-item {
             margin-bottom: 25px;
             padding: 20px;
-            background: #f8f9fa;
+            background: var(--section-bg);
             border-radius: 10px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid var(--accent-primary);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .education-item h3, .research-item h3 {
-            color: #2c3e50;
+            color: var(--header-content-text);
             margin-bottom: 5px;
+            transition: color 0.3s ease;
         }
 
         .date {
-            color: #6c757d;
+            color: var(--text-muted);
             font-style: italic;
             margin-bottom: 10px;
+            transition: color 0.3s ease;
         }
 
         .skills-grid {
@@ -160,15 +211,17 @@
         }
 
         .skill-category {
-            background: #f8f9fa;
+            background: var(--section-bg);
             padding: 20px;
             border-radius: 10px;
-            border-top: 3px solid #667eea;
+            border-top: 3px solid var(--accent-primary);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .skill-category h4 {
-            color: #2c3e50;
+            color: var(--header-content-text);
             margin-bottom: 10px;
+            transition: color 0.3s ease;
         }
 
         .contact-info {
@@ -178,16 +231,27 @@
         }
 
         .contact-item {
-            background: #f8f9fa;
+            background: var(--section-bg);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            transition: background 0.3s ease;
         }
 
         .contact-item strong {
-            color: #2c3e50;
+            color: var(--header-content-text);
             display: block;
             margin-bottom: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .contact-item a {
+            color: var(--link-color);
+            transition: color 0.3s ease;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent-primary);
         }
 
         .research-status {
@@ -202,18 +266,135 @@
         }
 
         .status-ongoing {
-            background: #d4edda;
-            color: #155724;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        body.dark-mode .status-ongoing {
+            background: #14532d;
+            color: #86efac;
         }
 
         .status-completed {
-            background: #cce7ff;
-            color: #004085;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        body.dark-mode .status-completed {
+            background: #1e3a8a;
+            color: #60a5fa;
         }
 
         .status-published {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        body.dark-mode .status-published {
+            background: #831843;
+            color: #f9a8d4;
+        }
+
+        /* Work Experience Boxes */
+        .work-exp-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--work-accent);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .work-exp-box {
+            background: #1e293b;
+            border-left: 4px solid var(--work-accent);
+        }
+
+        .work-exp-title {
+            margin: 0;
+            color: var(--header-content-text);
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .work-exp-title {
+            color: #f8fafc;
+        }
+
+        .work-exp-date {
+            background: var(--work-bg);
+            color: var(--work-accent);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .work-exp-date {
+            background: #334155;
+            color: #22d3ee;
+        }
+
+        .work-exp-company {
+            margin: 0 0 12px 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .work-exp-company {
+            color: #cbd5e1;
+        }
+
+        .work-exp-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .work-exp-list {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .work-exp-list li {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .skill-category,
+        body.dark-mode .contact-item,
+        body.dark-mode .education-item,
+        body.dark-mode .research-item {
+            background: var(--section-bg);
+        }
+
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -235,6 +416,9 @@
     <div class="container">
         <div class="card">
             <div class="header">
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+                    <span id="darkModeIcon">🌙</span>
+                </button>
                 <div class="header-content">
                     <h1>Tom Harrysson</h1>
                     <p>Second Year Doctor of Medicine and Surgery (MChD) Student</p>
@@ -287,39 +471,39 @@
                         <div class="date">Current & Previous Roles</div>
                         
                         <div style="display: flex; flex-direction: column; gap: 25px; margin-top: 15px;">
-                            <div style="background: white; padding: 25px; border-radius: 12px; border-left: 4px solid #8b7355; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="work-exp-box">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                                    <h4 style="margin: 0; color: #2c3e50; font-size: 1.1rem; font-weight: 600;">Health Service Officer</h4>
-                                    <span style="background: #f8f4f0; color: #8b7355; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; white-space: nowrap;">November 2024 - Present</span>
+                                    <h4 class="work-exp-title">Health Service Officer</h4>
+                                    <span class="work-exp-date">November 2024 - Present</span>
                                 </div>
-                                <p style="margin: 0 0 12px 0; font-size: 0.95rem; color: #495057; font-weight: 500;">Canberra Health Services</p>
-                                <ul style="margin: 0; padding-left: 18px; color: #6c757d; line-height: 1.6;">
+                                <p class="work-exp-company">Canberra Health Services</p>
+                                <ul class="work-exp-list">
                                     <li>Theatre Resource Team member responsible for surgical equipment preparation</li>
                                     <li>Equipment setup and maintenance for elective and emergency procedures</li>
                                     <li>Handling and processing of reusable medical devices (RMDs)</li>
                                 </ul>
                             </div>
                             
-                            <div style="background: white; padding: 25px; border-radius: 12px; border-left: 4px solid #8b7355; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="work-exp-box">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                                    <h4 style="margin: 0; color: #2c3e50; font-size: 1.1rem; font-weight: 600;">Wardsperson</h4>
-                                    <span style="background: #f8f4f0; color: #8b7355; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; white-space: nowrap;">February - November 2024</span>
+                                    <h4 class="work-exp-title">Wardsperson</h4>
+                                    <span class="work-exp-date">February - November 2024</span>
                                 </div>
-                                <p style="margin: 0 0 12px 0; font-size: 0.95rem; color: #495057; font-weight: 500;">Barton Private Hospital</p>
-                                <ul style="margin: 0; padding-left: 18px; color: #6c757d; line-height: 1.6;">
+                                <p class="work-exp-company">Barton Private Hospital</p>
+                                <ul class="work-exp-list">
                                     <li>Operating theatre preparation and equipment setup across multiple specialties</li>
                                     <li>Patient positioning and assistance during surgical procedures</li>
                                     <li>Support for Orthopaedics, Plastics, Urology, Gynaecology, and Pain Medicine cases</li>
                                 </ul>
                             </div>
                             
-                            <div style="background: white; padding: 25px; border-radius: 12px; border-left: 4px solid #8b7355; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <div class="work-exp-box">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                                    <h4 style="margin: 0; color: #2c3e50; font-size: 1.1rem; font-weight: 600;">Dispensary Technician</h4>
-                                    <span style="background: #f8f4f0; color: #8b7355; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; white-space: nowrap;">August 2019 - June 2021</span>
+                                    <h4 class="work-exp-title">Dispensary Technician</h4>
+                                    <span class="work-exp-date">August 2019 - June 2021</span>
                                 </div>
-                                <p style="margin: 0 0 12px 0; font-size: 0.95rem; color: #495057; font-weight: 500;">Capital Chemist Curtin</p>
-                                <ul style="margin: 0; padding-left: 18px; color: #6c757d; line-height: 1.6;">
+                                <p class="work-exp-company">Capital Chemist Curtin</p>
+                                <ul class="work-exp-list">
                                     <li>Medication dispensing using FRED Dispense pharmacy system</li>
                                     <li>Patient consultation and medication counseling</li>
                                     <li>Webster-pak medication packaging and compliance aids</li>
@@ -375,7 +559,7 @@
                         </div>
                     </div>
                     
-                    <div style="margin-top: 30px; text-align: center; color: #6c757d;">
+                    <div style="margin-top: 30px; text-align: center; color: var(--text-muted); transition: color 0.3s ease;">
                         <p>Feel free to reach out for collaboration opportunities, research discussions, or professional networking.</p>
                     </div>
                 </div>
@@ -402,6 +586,18 @@
             // Show the selected tab and mark button as active
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            
+            // Update icon
+            const icon = document.getElementById('darkModeIcon');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.textContent = '☀️';
+            } else {
+                icon.textContent = '🌙';
+            }
         }
     </script>
 </body>
