@@ -164,12 +164,12 @@
 
         .tab-button:hover {
             background: var(--border-color);
-            color: var(--er-content-text);
+            color: var(--header-content-text);
         }
 
         .tab-button.active {
             background: var(--card-bg);
-            color: var(--er-content-text);
+            color: var(--header-content-text);
             font-weight: 600;
         }
 
@@ -204,7 +204,7 @@
 
         .section-title {
             font-size: 1.8rem;
-            color: var(--er-content-text);
+            color: var(--header-content-text);
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--accent-primary);
@@ -221,7 +221,7 @@
         }
 
         .education-item h3, .research-item h3 {
-            color: var(--er-content-text);
+            color: var(--header-content-text);
             margin-bottom: 5px;
             transition: color 0.3s ease;
         }
@@ -249,7 +249,7 @@
         }
 
         .skill-category h4 {
-            color: var(--er-content-text);
+            color: var(--header-content-text);
             margin-bottom: 10px;
             transition: color 0.3s ease;
         }
@@ -269,7 +269,7 @@
         }
 
         .contact-item strong {
-            color: var(--er-content-text);
+            color: var(--header-content-text);
             display: block;
             margin-bottom: 5px;
             transition: color 0.3s ease;
@@ -342,7 +342,7 @@
 
         .work-exp-title {
             margin: 0;
-            color: var(--er-content-text);
+            color: var(--header-content-text);
             font-size: 1.1rem;
             font-weight: 600;
             transition: color 0.3s ease;
@@ -432,16 +432,25 @@
                 flex-direction: column;
             }
             
-            .er h1 {
+            .header h1 {
                 font-size: 2rem;
             }
             
             .tab-content {
                 padding: 20px;
             }
+            
+            .work-exp-box > div:first-child {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+            
+            .work-exp-date {
+                margin-top: 8px;
+            }
         }
     </style>
-</>
+</head>
 <body>
     <div class="container">
         <div class="card">
@@ -581,7 +590,7 @@
                         </div>
                         <div class="contact-item">
                             <strong>LinkedIn</strong>
-                            <a href="https://www.linkedin.com/in/tom-harrysson-9a2a29226" target="_blank" style="color: #667eea; text-decoration: none;">tom-harrysson-9a2a29226</a>
+                            <a href="https://www.linkedin.com/in/tom-harrysson-9a2a29226" target="_blank">tom-harrysson-9a2a29226</a>
                         </div>
                         <div class="contact-item">
                             <strong>Location</strong>
@@ -621,14 +630,24 @@
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             
-            // Update icon
-            const icon = document.getElementById('darkModeIcon');
+            // Save preference
             if (document.body.classList.contains('dark-mode')) {
-                icon.textContent = '☀️';
+                localStorage.setItem('darkMode', 'enabled');
+                document.getElementById('darkModeIcon').textContent = '☀️';
             } else {
-                icon.textContent = '🌙';
+                localStorage.setItem('darkMode', 'disabled');
+                document.getElementById('darkModeIcon').textContent = '🌙';
             }
         }
+
+        // Check for saved dark mode preference on page load
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeIcon').textContent = '☀️';
+            }
+        });
     </script>
 
     <!-- Structured Data (JSON-LD) for SEO -->
