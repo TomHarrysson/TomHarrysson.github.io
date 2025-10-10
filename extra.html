@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extra - Games & Tools | Tom Harrysson</title>
+    
+    <meta name="description" content="Fun games and useful tools - Tom's experimental playground">
+    <meta name="author" content="Tom Harrysson">
+    
+    <style>
+        :root {
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #cbd5e1;
+            --bg-gradient-end: #94a3b8;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --header-overlay: rgba(30, 41, 59, 0.85);
+            --header-content-bg: rgba(255, 255, 255, 0.98);
+            --header-content-text: #1e293b;
+            --section-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --accent-primary: #0891b2;
+            --accent-secondary: #06b6d4;
+            --link-color: #0891b2;
+            --game-card-bg: #ffffff;
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-mid: #1e293b;
+            --bg-gradient-end: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --card-bg: rgba(51, 65, 85, 0.95);
+            --header-overlay: rgba(15, 23, 42, 0.95);
+            --header-content-bg: rgba(51, 65, 85, 0.98);
+            --header-content-text: #f8fafc;
+            --section-bg: #475569;
+            --border-color: #64748b;
+            --accent-primary: #06b6d4;
+            --accent-secondary: #22d3ee;
+            --link-color: #22d3ee;
+            --game-card-bg: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(var(--header-overlay), var(--header-overlay));
+            color: white;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .header-content {
+            background: var(--header-content-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px 40px;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: var(--header-content-text);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            background: var(--card-bg);
+            color: var(--header-content-text);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--header-content-text);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-primary);
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: var(--game-card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            color: var(--header-content-text);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .game-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .game-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        body.dark-mode .status-available {
+            background: #14532d;
+            color: #86efac;
+        }
+
+        .intro-text {
+            background: var(--section-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .intro-text h3 {
+            color: var(--header-content-text);
+            margin-bottom: 10px;
+        }
+
+        .intro-text p {
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .back-button {
+                position: static;
+                display: inline-block;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <a href="index.html" class="back-button">← Back to Home</a>
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+                    <span id="darkModeIcon">🌙</span>
+                </button>
+                <div class="header-content">
+                    <h1>Extra: Games & Tools</h1>
+                    <p>My Experimental Playground</p>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="intro-text">
+                    <h3>Welcome to my tinkering space!</h3>
+                    <p>This is where I experiment with web development, build simple games, and create useful tools. Check back regularly for new additions!</p>
+                </div>
+
+                <h2 class="section-title">🎮 Games</h2>
+
+                <div class="games-grid">
+                    <a href="medical-wordle.html" class="game-card">
+                        <span class="game-icon">🏥</span>
+                        <h3 class="game-title">Medical Wordle</h3>
+                        <p class="game-description">Test your medical vocabulary! Guess the 5-letter medical term in 6 tries.</p>
+                        <span class="game-status status-available">Play Now</span>
+                    </a>
+
+                    <a href="pong.html" class="game-card">
+                        <span class="game-icon">🏓</span>
+                        <h3 class="game-title">Classic Pong</h3>
+                        <p class="game-description">The classic arcade game! Use arrow keys to control your paddle.</p>
+                        <span class="game-status status-available">Play Now</span>
+                    </a>
+                </div>
+
+                <h2 class="section-title">🛠️ Tools</h2>
+
+                <div class="games-grid">
+                    <a href="flashcards.html" class="game-card">
+                        <span class="game-icon">📚</span>
+                        <h3 class="game-title">Flashcard Generator</h3>
+                        <p class="game-description">Create and practice with custom medical flashcards. Perfect for studying!</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+                </div>
+
+                <div style="margin-top: 50px; padding: 30px; background: var(--section-bg); border-radius: 12px; text-align: center;">
+                    <h3 style="color: var(--header-content-text); margin-bottom: 15px;">🚀 More Coming Soon!</h3>
+                    <p style="color: var(--text-secondary); max-width: 800px; margin: 0 auto; line-height: 1.8;">
+                        This page is constantly evolving. I'll be adding new games and tools as I learn and experiment with different technologies. 
+                        Got suggestions? Let me know via the contact page!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+                document.getElementById('darkModeIcon').textContent = '☀️';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                document.getElementById('darkModeIcon').textContent = '🌙';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeIcon').textContent = '☀️';
+            }
+        });
+    </script>
+</body>
+</html>
