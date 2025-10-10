@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Wordle | Tom Harrysson</title>
+    <style>
+        :root {
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #cbd5e1;
+            --bg-gradient-end: #94a3b8;
+            --text-primary: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --header-content-text: #1e293b;
+            --accent-primary: #0891b2;
+            --correct: #15803d;
+            --present: #ca8a04;
+            --absent: #64748b;
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-mid: #1e293b;
+            --bg-gradient-end: #334155;
+            --text-primary: #f8fafc;
+            --card-bg: rgba(51, 65, 85, 0.95);
+            --header-content-text: #f8fafc;
+            --accent-primary: #06b6d4;
+            --correct: #22c55e;
+            --present: #fbbf24;
+            --absent: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--header-content-text);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-primary);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .game-board {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 30px;
+        }
+
+        .row {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .tile {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .tile.correct {
+            background: var(--correct);
+            border-color: var(--correct);
+            color: white;
+        }
+
+        .tile.present {
+            background: var(--present);
+            border-color: var(--present);
+            color: white;
+        }
+
+        .tile.absent {
+            background: var(--absent);
+            border-color: var(--absent);
+            color: white;
+        }
+
+        .tile.filled {
+            border-color: var(--accent-primary);
+            animation: pop 0.1s ease-in-out;
+        }
+
+        @keyframes pop {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .key {
+            padding: 15px 10px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 35px;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        body.dark-mode .key {
+            background: #475569;
+            color: #f8fafc;
+        }
+
+        .key:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .key.wide {
+            min-width: 60px;
+        }
+
+        .key.correct {
+            background: var(--correct);
+            color: white;
+        }
+
+        .key.present {
+            background: var(--present);
+            color: white;
+        }
+
+        .key.absent {
+            background: var(--absent);
+            color: white;
+            opacity: 0.5;
+        }
+
+        .message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        body.dark-mode .message.success {
+            background: #14532d;
+            color: #86efac;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        body.dark-mode .message.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button.primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent-primary), #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">
+        <span id="darkIcon">🌙</span>
+    </button>
+
+    <div class="container">
+        <a href="extra.html" class="back-link">← Back to Games</a>
+        
+        <div class="header">
+            <h1>🏥 Medical Wordle</h1>
+            <p class="subtitle">Guess the 5-letter medical term in 6 tries</p>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="game-board" id="board"></div>
+
+        <div class="keyboard" id="keyboard"></div>
+
+        <div class="buttons">
+            <button class="primary" onclick="resetGame()">New Game</button>
+        </div>
+    </div>
+
+    <script>
+        const WORDS = [
+            'ACUTE', 'ARTERY', 'BLOOD', 'BIOPSY', 'BONES', 'BRAIN', 'CHEST', 'COLON',
+            'CROHN', 'DEATH', 'DONOR', 'EDEMA', 'FEVER', 'GLAND', 'HEART', 'HYPER',
+            'JOINT', 'LIVER', 'LUNGS', 'LYMPH', 'NERVE', 'ORGAN', 'PULSE', 'RENAL',
+            'SERUM', 'SKULL', 'SPINE', 'SPORE', 'STENT', 'STONE', 'STROKE', 'SWEAT',
+            'TONIC', 'TUMOR', 'ULCER', 'URINE', 'VALVE', 'VEINS', 'VIRAL', 'WOUND'
+        ];
+
+        let targetWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+        let currentRow = 0;
+        let currentGuess = '';
+        let gameOver = false;
+
+        const KEYBOARD_LAYOUT = [
+            ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+            ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+            ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACK']
+        ];
+
+        function initGame() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                for (let j = 0; j < 5; j++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.id = `tile-${i}-${j}`;
+                    row.appendChild(tile);
+                }
+                board.appendChild(row);
+            }
+
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+            
+            KEYBOARD_LAYOUT.forEach(row => {
+                const keyRow = document.createElement('div');
+                keyRow.className = 'keyboard-row';
+                
+                row.forEach(key => {
+                    const button = document.createElement('button');
+                    button.className = 'key';
+                    if (key === 'ENTER' || key === 'BACK') {
+                        button.className += ' wide';
+                    }
+                    button.textContent = key === 'BACK' ? '←' : key;
+                    button.id = `key-${key}`;
+                    button.onclick = () => handleKey(key);
+                    keyRow.appendChild(button);
+                });
+                
+                keyboard.appendChild(keyRow);
+            });
+        }
+
+        function handleKey(key) {
+            if (gameOver) return;
+
+            if (key === 'BACK') {
+                if (currentGuess.length > 0) {
+                    currentGuess = currentGuess.slice(0, -1);
+                    updateBoard();
+                }
+            } else if (key === 'ENTER') {
+                if (currentGuess.length === 5) {
+                    submitGuess();
+                } else {
+                    showMessage('Not enough letters!', 'error');
+                }
+            } else {
+                if (currentGuess.length < 5) {
+                    currentGuess += key;
+                    updateBoard();
+                }
+            }
+        }
+
+        function updateBoard() {
+            for (let i = 0; i < 5; i++) {
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                if (i < currentGuess.length) {
+                    tile.textContent = currentGuess[i];
+                    tile.classList.add('filled');
+                } else {
+                    tile.textContent = '';
+                    tile.classList.remove('filled');
+                }
+            }
+        }
+
+        function submitGuess() {
+            const guess = currentGuess;
+            const result = checkGuess(guess);
+            
+            animateRow(currentRow, result);
+            updateKeyboard(guess, result);
+
+            if (guess === targetWord) {
+                setTimeout(() => {
+                    showMessage(`🎉 Excellent! You got it in ${currentRow + 1} tries!`, 'success');
+                    gameOver = true;
+                }, 1500);
+            } else if (currentRow === 5) {
+                setTimeout(() => {
+                    showMessage(`Game Over! The word was: ${targetWord}`, 'error');
+                    gameOver = true;
+                }, 1500);
+            } else {
+                currentRow++;
+                currentGuess = '';
+            }
+        }
+
+        function checkGuess(guess) {
+            const result = [];
+            const targetLetters = targetWord.split('');
+            const guessLetters = guess.split('');
+            
+            for (let i = 0; i < 5; i++) {
+                if (guessLetters[i] === targetLetters[i]) {
+                    result[i] = 'correct';
+                    targetLetters[i] = null;
+                }
+            }
+            
+            for (let i = 0; i < 5; i++) {
+                if (result[i]) continue;
+                
+                const letterIndex = targetLetters.indexOf(guessLetters[i]);
+                if (letterIndex !== -1) {
+                    result[i] = 'present';
+                    targetLetters[letterIndex] = null;
+                } else {
+                    result[i] = 'absent';
+                }
+            }
+            
+            return result;
+        }
+
+        function animateRow(row, result) {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const tile = document.getElementById(`tile-${row}-${i}`);
+                    tile.classList.add(result[i]);
+                }, i * 200);
+            }
+        }
+
+        function updateKeyboard(guess, result) {
+            for (let i = 0; i < 5; i++) {
+                const key = document.getElementById(`key-${guess[i]}`);
+                if (!key) continue;
+                
+                if (result[i] === 'correct') {
+                    key.classList.remove('present', 'absent');
+                    key.classList.add('correct');
+                } else if (result[i] === 'present' && !key.classList.contains('correct')) {
+                    key.classList.remove('absent');
+                    key.classList.add('present');
+                } else if (result[i] === 'absent' && !key.classList.contains('correct') && !key.classList.contains('present')) {
+                    key.classList.add('absent');
+                }
+            }
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type} show`;
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+
+        function resetGame() {
+            targetWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+            currentRow = 0;
+            currentGuess = '';
+            gameOver = false;
+            document.getElementById('message').classList.remove('show');
+            initGame();
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('darkIcon');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+                icon.textContent = '☀️';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                icon.textContent = '🌙';
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (gameOver) return;
+            
+            const key = e.key.toUpperCase();
+            
+            if (key === 'ENTER') {
+                handleKey('ENTER');
+            } else if (key === 'BACKSPACE') {
+                handleKey('BACK');
+            } else if (/^[A-Z]$/.test(key)) {
+                handleKey(key);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkIcon').textContent = '☀️';
+            }
+            initGame();
+        });
+    </script>
+</body>
+</html>
