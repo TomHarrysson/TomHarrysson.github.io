@@ -1,8 +1,0 @@
-{
-  "name": "tom-harrysson-website",
-  "version": "1.0.0",
-  "description": "Tom Harrysson's personal website with MCQ generator",
-  "type": "module",
-  "dependencies": {},
-  "devDependencies": {}
-}
