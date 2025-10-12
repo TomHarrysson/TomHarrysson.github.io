@@ -315,6 +315,15 @@
             color: #fde68a;
         }
 
+        .explanation-text strong {
+            display: block;
+            margin-top: 10px;
+        }
+
+        .explanation-text strong:first-child {
+            margin-top: 0;
+        }
+
         .score-card {
             background: var(--section-bg);
             padding: 20px;
@@ -373,11 +382,30 @@
         </div>
 
         <div class="section">
-            <h2>ChatGPT Prompt</h2>
-            <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this entire prompt and paste it into ChatGPT:</p>
-            <pre style="background: var(--section-bg); padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">Create 10 multiple choice questions based on the following medical material. Format your response as a JSON array only, with no additional text or markdown.
+            <h2>Step 1: Choose Number of Questions</h2>
+            <div style="margin-bottom: 20px;">
+                <label for="numQuestions" style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-primary);">How many questions do you want?</label>
+                <select id="numQuestions" onchange="updatePrompt()" style="width: 200px; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; background: var(--card-bg); color: var(--text-primary);">
+                    <option value="5">5 Questions</option>
+                    <option value="10" selected>10 Questions</option>
+                    <option value="15">15 Questions</option>
+                    <option value="20">20 Questions</option>
+                </select>
+            </div>
+        </div>
 
-Use this exact format:
+        <div class="section">
+            <h2>Step 2: Copy ChatGPT Prompt</h2>
+            <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this prompt and paste it into ChatGPT with your study material:</p>
+            <button onclick="copyPrompt()" style="margin-bottom: 10px; width: 100%;">
+                📋 Copy Prompt to Clipboard
+            </button>
+            <div style="position: relative;">
+                <pre id="promptText" style="background: var(--section-bg); padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">Create <span id="promptNum">10</span> multiple choice questions based on the following medical material. Format your response as a JSON array INSIDE A CODE BLOCK for easy copying.
+
+Use this exact format (include the ```json code block):
+
+```json
 [
   {
     "question": "Your question text here?",
@@ -392,6 +420,7 @@ Use this exact format:
     ]
   }
 ]
+```
 
 Rules:
 - Each question must have exactly 5 options (A-E)
@@ -399,17 +428,20 @@ Rules:
 - "explanations" array must have 5 explanations, one for each option
 - Each explanation should explain why that option is correct or incorrect
 - Make questions test important concepts
-- Respond ONLY with the JSON array, no markdown code blocks
+- IMPORTANT: Put your response in a ```json code block so it's easy to copy
 
 My study material:
 [PASTE YOUR NOTES HERE]</pre>
+            </div>
         </div>
 
         <div class="error-message" id="errorMessage"></div>
 
         <div class="section" id="inputSection">
-            <h2>Paste JSON from ChatGPT</h2>
-            <textarea id="jsonInput" placeholder='Paste the JSON here, for example:
+            <h2>Step 3: Paste JSON from ChatGPT</h2>
+            <textarea id="jsonInput" placeholder='Paste the JSON here (you can paste the whole code block from ChatGPT, it will be cleaned automatically):
+
+Example:
 [
   {
     "question": "What forms the brachial plexus?",
@@ -449,13 +481,38 @@ My study material:
         let userAnswers = [];
         let answered = false;
 
+        function updatePrompt() {
+            const numQuestions = document.getElementById('numQuestions').value;
+            document.getElementById('promptNum').textContent = numQuestions;
+        }
+
+        function copyPrompt() {
+            const promptText = document.getElementById('promptText').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                // Visual feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.style.background = '#22c55e';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+
         function loadQuiz() {
-            const input = document.getElementById('jsonInput').value.trim();
+            let input = document.getElementById('jsonInput').value.trim();
             
             if (!input) {
                 showError('Please paste JSON data first!');
                 return;
             }
+
+            // Clean up markdown code blocks if present
+            input = input.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
             try {
                 // Try to parse the JSON
@@ -562,10 +619,41 @@ My study material:
                     }
                 }
                 
-                // Show explanation for the user's selected answer (or correct answer if none selected)
-                const explanationIndex = userAnswer !== null ? userAnswer : correctAnswer;
-                const explanationText = mcq.explanations[explanationIndex];
-                document.getElementById(`explanation-text-${index}`).textContent = explanationText;
+                // Show explanation for the user's selected answer AND the correct answer if wrong
+                let explanationHTML = '';
+                
+                if (userAnswer !== null && userAnswer !== correctAnswer) {
+                    // User got it wrong - show both explanations
+                    explanationHTML = `
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #dc2626;">Your answer (${String.fromCharCode(65 + userAnswer)}):</strong><br>
+                            ${mcq.explanations[userAnswer]}
+                        </div>
+                        <div>
+                            <strong style="color: #15803d;">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
+                            ${mcq.explanations[correctAnswer]}
+                        </div>
+                    `;
+                } else if (userAnswer === correctAnswer) {
+                    // User got it right - show correct explanation
+                    explanationHTML = `
+                        <div>
+                            <strong style="color: #15803d;">✓ Correct!</strong><br>
+                            ${mcq.explanations[correctAnswer]}
+                        </div>
+                    `;
+                } else {
+                    // User didn't answer - show correct explanation
+                    explanationHTML = `
+                        <div>
+                            <strong style="color: #f59e0b;">No answer selected</strong><br>
+                            <strong>Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
+                            ${mcq.explanations[correctAnswer]}
+                        </div>
+                    `;
+                }
+                
+                document.getElementById(`explanation-text-${index}`).innerHTML = explanationHTML;
                 document.getElementById(`explanation-${index}`).classList.add('show');
                 
                 // Update score
