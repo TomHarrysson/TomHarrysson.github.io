@@ -18,6 +18,9 @@
             --accent-primary: #0891b2;
             --correct: #15803d;
             --incorrect: #dc2626;
+            --info-box-text: #78350f;
+            --info-box-h3: #92400e;
+            --unanswered-color: #f59e0b;
         }
 
         body.dark-mode {
@@ -33,6 +36,8 @@
             --accent-primary: #06b6d4;
             --correct: #22c55e;
             --incorrect: #ef4444;
+            --info-box-text: #fde68a;
+            --info-box-h3: #fde68a;
         }
 
         * {
@@ -127,26 +132,14 @@
         }
 
         .info-box h3 {
-            color: #92400e;
+            color: var(--info-box-h3);
             margin-bottom: 10px;
         }
-
-        body.dark-mode .info-box h3 {
-            color: #fde68a;
-        }
-
-        .info-box pre {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-size: 0.9rem;
-            color: #1e293b;
-        }
-
-        body.dark-mode .info-box pre {
-            background: #1e293b;
-            color: #f8fafc;
+        
+        .info-box ol {
+            color: var(--info-box-text);
+            line-height: 1.8;
+            margin-left: 20px;
         }
 
         textarea {
@@ -298,21 +291,13 @@
 
         .explanation-label {
             font-weight: 700;
-            color: #92400e;
+            color: var(--info-box-h3);
             margin-bottom: 5px;
         }
 
-        body.dark-mode .explanation-label {
-            color: #fde68a;
-        }
-
         .explanation-text {
-            color: #78350f;
+            color: var(--info-box-text);
             line-height: 1.6;
-        }
-
-        body.dark-mode .explanation-text {
-            color: #fde68a;
         }
 
         .explanation-text strong {
@@ -323,6 +308,11 @@
         .explanation-text strong:first-child {
             margin-top: 0;
         }
+
+        .feedback-correct { color: var(--correct); }
+        .feedback-incorrect { color: var(--incorrect); }
+        .feedback-unanswered { color: var(--unanswered-color); }
+        .feedback-unanswered-text { color: var(--text-primary); }
 
         .score-card {
             background: var(--section-bg);
@@ -360,7 +350,7 @@
     </style>
 </head>
 <body>
-    <button class="dark-toggle" onclick="toggleDarkMode()">
+    <button id="darkToggle" class="dark-toggle">
         <span id="darkIcon">🌙</span>
     </button>
 
@@ -372,7 +362,7 @@
 
         <div class="info-box">
             <h3>📋 How to Use:</h3>
-            <ol style="color: #78350f; line-height: 1.8; margin-left: 20px;">
+            <ol>
                 <li>Copy the prompt below and paste it into ChatGPT</li>
                 <li>Add your study material to ChatGPT</li>
                 <li>Copy the JSON output from ChatGPT</li>
@@ -385,7 +375,7 @@
             <h2>Step 1: Choose Number of Questions</h2>
             <div style="margin-bottom: 20px;">
                 <label for="numQuestions" style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-primary);">How many questions do you want?</label>
-                <select id="numQuestions" onchange="updatePrompt()" style="width: 200px; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; background: var(--card-bg); color: var(--text-primary);">
+                <select id="numQuestions" style="width: 200px; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; background: var(--card-bg); color: var(--text-primary);">
                     <option value="5">5 Questions</option>
                     <option value="10" selected>10 Questions</option>
                     <option value="15">15 Questions</option>
@@ -397,7 +387,7 @@
         <div class="section">
             <h2>Step 2: Copy ChatGPT Prompt</h2>
             <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this prompt and paste it into ChatGPT with your study material:</p>
-            <button onclick="copyPrompt(this)" style="margin-bottom: 10px; width: 100%;">
+            <button id="copyPromptBtn" style="margin-bottom: 10px; width: 100%;">
                 📋 Copy Prompt to Clipboard
             </button>
             <div style="position: relative;">
@@ -461,8 +451,8 @@ Example:
 }
 ]'></textarea>
 <div class="button-group">
-<button onclick="loadQuiz()">Load Quiz</button>
-<button onclick="clearInput()">Clear</button>
+<button id="loadQuizBtn">Load Quiz</button>
+<button id="clearBtn">Clear</button>
 </div>
 </div>
 
@@ -475,8 +465,8 @@ Example:
     <div class="mcq-container" id="mcqContainer"></div>
 
     <div class="button-group" id="actionButtons" style="display: none;">
-        <button onclick="checkAnswers()">Check Answers</button>
-        <button onclick="resetQuiz()">New Quiz</button>
+        <button id="checkAnswersBtn">Check Answers</button>
+        <button id="resetQuizBtn">New Quiz</button>
     </div>
 </div>
 
@@ -493,7 +483,6 @@ Example:
     function copyPrompt(button) {
         const promptText = document.getElementById('promptText').textContent;
         navigator.clipboard.writeText(promptText).then(() => {
-            // Visual feedback
             const originalText = button.textContent;
             const originalBackground = button.style.background;
             button.textContent = '✓ Copied!';
@@ -520,7 +509,6 @@ Example:
         input = input.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
         try {
-            // Try to parse the JSON
             mcqData = JSON.parse(input);
             
             // Validate structure
@@ -624,18 +612,17 @@ Example:
                 }
             }
             
-            // Show explanation for the user's selected answer AND the correct answer if wrong
             let explanationHTML = '';
             
             if (userAnswer !== null && userAnswer !== correctAnswer) {
                 // User got it wrong - show both explanations
                 explanationHTML = `
                     <div style="margin-bottom: 15px;">
-                        <strong style="color: var(--incorrect);">Your answer (${String.fromCharCode(65 + userAnswer)}):</strong><br>
+                        <strong class="feedback-incorrect">Your answer (${String.fromCharCode(65 + userAnswer)}):</strong>
                         ${mcq.explanations[userAnswer]}
                     </div>
                     <div>
-                        <strong style="color: var(--correct);">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
+                        <strong class="feedback-correct">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong>
                         ${mcq.explanations[correctAnswer]}
                     </div>
                 `;
@@ -643,7 +630,7 @@ Example:
                 // User got it right - show correct explanation
                 explanationHTML = `
                     <div>
-                        <strong style="color: var(--correct);">✓ Correct!</strong><br>
+                        <strong class="feedback-correct">✓ Correct!</strong>
                         ${mcq.explanations[correctAnswer]}
                     </div>
                 `;
@@ -651,16 +638,13 @@ Example:
                 // User didn't answer - show correct explanation
                 explanationHTML = `
                     <div>
-                        <strong style="color: #f59e0b;">No answer selected</strong><br>
-                        <strong>Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
+                        <strong class="feedback-unanswered">No answer selected</strong>
+                        <strong class="feedback-unanswered-text">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong>
                         ${mcq.explanations[correctAnswer]}
                     </div>
                 `;
             }
             
-            // Use CSS variables for strong tags for dark mode compatibility (good practice)
-            explanationHTML = explanationHTML.replace(/#dc2626/g, 'var(--incorrect)').replace(/#15803d/g, 'var(--correct)');
-
             document.getElementById(`explanation-text-${index}`).innerHTML = explanationHTML;
             document.getElementById(`explanation-${index}`).classList.add('show');
             
@@ -730,11 +714,20 @@ Example:
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-        const darkMode = localStorage.getItem('darkMode');
-        if (darkMode === 'enabled') {
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
             document.body.classList.add('dark-mode');
             document.getElementById('darkIcon').textContent = '☀️';
         }
+
+        // Add Event Listeners
+        document.getElementById('darkToggle').addEventListener('click', toggleDarkMode);
+        document.getElementById('numQuestions').addEventListener('change', updatePrompt);
+        document.getElementById('copyPromptBtn').addEventListener('click', function() { copyPrompt(this); });
+        document.getElementById('loadQuizBtn').addEventListener('click', loadQuiz);
+        document.getElementById('clearBtn').addEventListener('click', clearInput);
+        document.getElementById('checkAnswersBtn').addEventListener('click', checkAnswers);
+        document.getElementById('resetQuizBtn').addEventListener('click', resetQuiz);
     });
 </script>
 
