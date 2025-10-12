@@ -155,7 +155,7 @@
             resize: vertical;
         }
 
-        button {
+        button, .file-upload-label {
             padding: 12px 24px;
             background: linear-gradient(135deg, var(--accent-primary), #06b6d4);
             color: white;
@@ -166,9 +166,10 @@
             transition: all 0.3s ease;
             font-size: 1rem;
             margin-right: 10px;
+            display: inline-block; /* For label */
         }
 
-        button:hover:not(:disabled) {
+        button:hover:not(:disabled), .file-upload-label:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
@@ -176,6 +177,12 @@
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        #uploadFile {
+            display: none; /* Hide the actual file input */
         }
 
         .error-message {
@@ -363,10 +370,10 @@
         <div class="info-box">
             <h3>📋 How to Use:</h3>
             <ol>
-                <li>Copy the prompt below and paste it into ChatGPT</li>
-                <li>Add your study material to ChatGPT</li>
-                <li>Copy the JSON output from ChatGPT</li>
-                <li>Paste it in the text box below</li>
+                <li>Copy the prompt below and paste it into ChatGPT.</li>
+                <li>Add your study material to ChatGPT.</li>
+                <li>Copy the JSON output from ChatGPT.</li>
+                <li>Paste it in the text box below **OR** upload the file if you saved one.</li>
                 <li>Click "Load Quiz" and start!</li>
             </ol>
         </div>
@@ -413,15 +420,10 @@ Use this exact format (include the ```json code block):
 Rules:
 
     Each question must have exactly 5 options (A-E)
-
     "correct" is the index (0-4) of the correct option
-
     "explanations" array must have 5 explanations, one for each option
-
     Each explanation should explain why that option is correct or incorrect
-
     Make questions test important concepts
-
     IMPORTANT: Put your response in a ```json code block so it's easy to copy
 
 My study material:
@@ -432,7 +434,7 @@ My study material:
     <div class="error-message" id="errorMessage"></div>
 
     <div class="section" id="inputSection">
-        <h2>Step 3: Paste JSON from ChatGPT</h2>
+        <h2>Step 3: Paste JSON or Upload File</h2>
         <textarea id="jsonInput" placeholder='Paste the JSON here (you can paste the whole code block from ChatGPT, it will be cleaned automatically):
 
 Example:
@@ -450,11 +452,13 @@ Example:
 ]
 }
 ]'></textarea>
-<div class="button-group">
-<button id="loadQuizBtn">Load Quiz</button>
-<button id="clearBtn">Clear</button>
-</div>
-</div>
+        <div class="button-group">
+            <button id="loadQuizBtn">Load Quiz</button>
+            <label for="uploadFile" class="file-upload-label">Upload File</label>
+            <input type="file" id="uploadFile" accept=".json, .txt">
+            <button id="clearBtn">Clear</button>
+        </div>
+    </div>
 
     <div class="score-card" id="scoreCard">
         <h2>Your Score</h2>
@@ -466,6 +470,7 @@ Example:
 
     <div class="button-group" id="actionButtons" style="display: none;">
         <button id="checkAnswersBtn">Check Answers</button>
+        <button id="downloadJsonBtn" disabled>Download JSON</button>
         <button id="resetQuizBtn">New Quiz</button>
     </div>
 </div>
@@ -501,22 +506,19 @@ Example:
         let input = document.getElementById('jsonInput').value.trim();
         
         if (!input) {
-            showError('Please paste JSON data first!');
+            showError('Please paste or upload JSON data first!');
             return;
         }
 
-        // Clean up markdown code blocks if present
         input = input.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
         try {
             mcqData = JSON.parse(input);
             
-            // Validate structure
             if (!Array.isArray(mcqData) || mcqData.length === 0) {
                 throw new Error('JSON must be an array with at least one question');
             }
             
-            // Validate each question
             mcqData.forEach((q, i) => {
                 if (!q.question || !q.options || !Array.isArray(q.options) || 
                     q.correct === undefined || !q.explanations || !Array.isArray(q.explanations)) {
@@ -534,11 +536,13 @@ Example:
             answered = false;
             
             document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('downloadJsonBtn').disabled = false; // Enable download button
             displayMCQs();
             
         } catch (error) {
             showError('Invalid JSON format: ' + error.message);
             console.error('Parse error:', error);
+            document.getElementById('downloadJsonBtn').disabled = true;
         }
     }
 
@@ -571,22 +575,17 @@ Example:
         document.getElementById('actionButtons').style.display = 'flex';
         document.getElementById('scoreCard').classList.remove('show');
         
-        // Scroll to quiz
         container.scrollIntoView({ behavior: 'smooth' });
     }
 
     function selectOption(questionIndex, optionIndex) {
         if (answered) return;
         
-        // Clear previous selection
         for (let i = 0; i < 5; i++) {
-            const opt = document.getElementById(`option-${questionIndex}-${i}`);
-            opt.classList.remove('selected');
+            document.getElementById(`option-${questionIndex}-${i}`).classList.remove('selected');
         }
         
-        // Select new option
-        const option = document.getElementById(`option-${questionIndex}-${optionIndex}`);
-        option.classList.add('selected');
+        document.getElementById(`option-${questionIndex}-${optionIndex}`).classList.add('selected');
         userAnswers[questionIndex] = optionIndex;
     }
 
@@ -599,7 +598,6 @@ Example:
             const userAnswer = userAnswers[index];
             const correctAnswer = mcq.correct;
             
-            // Show all options as disabled
             for (let i = 0; i < 5; i++) {
                 const opt = document.getElementById(`option-${index}-${i}`);
                 opt.classList.add('disabled');
@@ -615,7 +613,6 @@ Example:
             let explanationHTML = '';
             
             if (userAnswer !== null && userAnswer !== correctAnswer) {
-                // User got it wrong - show both explanations
                 explanationHTML = `
                     <div style="margin-bottom: 15px;">
                         <strong class="feedback-incorrect">Your answer (${String.fromCharCode(65 + userAnswer)}):</strong>
@@ -624,31 +621,25 @@ Example:
                     <div>
                         <strong class="feedback-correct">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong>
                         ${mcq.explanations[correctAnswer]}
-                    </div>
-                `;
+                    </div>`;
             } else if (userAnswer === correctAnswer) {
-                // User got it right - show correct explanation
                 explanationHTML = `
                     <div>
                         <strong class="feedback-correct">✓ Correct!</strong>
                         ${mcq.explanations[correctAnswer]}
-                    </div>
-                `;
+                    </div>`;
             } else {
-                // User didn't answer - show correct explanation
                 explanationHTML = `
                     <div>
                         <strong class="feedback-unanswered">No answer selected</strong>
                         <strong class="feedback-unanswered-text">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong>
                         ${mcq.explanations[correctAnswer]}
-                    </div>
-                `;
+                    </div>`;
             }
             
             document.getElementById(`explanation-text-${index}`).innerHTML = explanationHTML;
             document.getElementById(`explanation-${index}`).classList.add('show');
             
-            // Update score
             if (userAnswer === correctAnswer) {
                 score++;
             }
@@ -656,7 +647,6 @@ Example:
         
         answered = true;
         
-        // Show score card
         const scoreCard = document.getElementById('scoreCard');
         const scoreNumber = document.getElementById('scoreNumber');
         const scoreMessage = document.getElementById('scoreMessage');
@@ -684,6 +674,8 @@ Example:
         document.getElementById('scoreCard').classList.remove('show');
         document.getElementById('actionButtons').style.display = 'none';
         document.getElementById('jsonInput').value = '';
+        document.getElementById('uploadFile').value = ''; // Clear file input
+        document.getElementById('downloadJsonBtn').disabled = true; // Disable download button
         mcqData = [];
         userAnswers = [];
         answered = false;
@@ -691,6 +683,7 @@ Example:
 
     function clearInput() {
         document.getElementById('jsonInput').value = '';
+        document.getElementById('uploadFile').value = '';
     }
 
     function showError(message) {
@@ -713,8 +706,40 @@ Example:
         }
     }
 
+    function downloadJson() {
+        if (mcqData.length === 0) return;
+
+        const jsonString = JSON.stringify(mcqData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const date = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `quiz-${date}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            document.getElementById('jsonInput').value = text;
+            loadQuiz();
+        };
+        reader.onerror = function(e) {
+            showError("Error reading file.");
+            console.error("File reading error", e);
+        };
+        reader.readAsText(file);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
-        // Check for saved dark mode preference
         if (localStorage.getItem('darkMode') === 'enabled') {
             document.body.classList.add('dark-mode');
             document.getElementById('darkIcon').textContent = '☀️';
@@ -728,6 +753,8 @@ Example:
         document.getElementById('clearBtn').addEventListener('click', clearInput);
         document.getElementById('checkAnswersBtn').addEventListener('click', checkAnswers);
         document.getElementById('resetQuizBtn').addEventListener('click', resetQuiz);
+        document.getElementById('downloadJsonBtn').addEventListener('click', downloadJson);
+        document.getElementById('uploadFile').addEventListener('change', handleFileUpload);
     });
 </script>
 
