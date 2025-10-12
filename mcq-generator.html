@@ -397,7 +397,7 @@
         <div class="section">
             <h2>Step 2: Copy ChatGPT Prompt</h2>
             <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this prompt and paste it into ChatGPT with your study material:</p>
-            <button onclick="copyPrompt()" style="margin-bottom: 10px; width: 100%;">
+            <button onclick="copyPrompt(this)" style="margin-bottom: 10px; width: 100%;">
                 📋 Copy Prompt to Clipboard
             </button>
             <div style="position: relative;">
@@ -420,314 +420,323 @@ Use this exact format (include the ```json code block):
     ]
   }
 ]
-```
-
 Rules:
-- Each question must have exactly 5 options (A-E)
-- "correct" is the index (0-4) of the correct option
-- "explanations" array must have 5 explanations, one for each option
-- Each explanation should explain why that option is correct or incorrect
-- Make questions test important concepts
-- IMPORTANT: Put your response in a ```json code block so it's easy to copy
+
+    Each question must have exactly 5 options (A-E)
+
+    "correct" is the index (0-4) of the correct option
+
+    "explanations" array must have 5 explanations, one for each option
+
+    Each explanation should explain why that option is correct or incorrect
+
+    Make questions test important concepts
+
+    IMPORTANT: Put your response in a ```json code block so it's easy to copy
 
 My study material:
 [PASTE YOUR NOTES HERE]</pre>
-            </div>
-        </div>
+</div>
+</div>
 
-        <div class="error-message" id="errorMessage"></div>
+    <div class="error-message" id="errorMessage"></div>
 
-        <div class="section" id="inputSection">
-            <h2>Step 3: Paste JSON from ChatGPT</h2>
-            <textarea id="jsonInput" placeholder='Paste the JSON here (you can paste the whole code block from ChatGPT, it will be cleaned automatically):
+    <div class="section" id="inputSection">
+        <h2>Step 3: Paste JSON from ChatGPT</h2>
+        <textarea id="jsonInput" placeholder='Paste the JSON here (you can paste the whole code block from ChatGPT, it will be cleaned automatically):
 
 Example:
 [
-  {
-    "question": "What forms the brachial plexus?",
-    "options": ["C3-C7", "C5-T1", "C6-T2", "C4-C8", "C7-T2"],
-    "correct": 1,
-    "explanations": [
-      "Incorrect. C3-C7 does not include T1, which is essential for the brachial plexus.",
-      "Correct! The brachial plexus is formed by ventral rami of C5-T1.",
-      "Incorrect. This range starts too low and misses C5.",
-      "Incorrect. C4 may contribute via the dorsal scapular nerve but is not a main component.",
-      "Incorrect. This range misses C5 and C6 which are crucial components."
-    ]
-  }
+{
+"question": "What forms the brachial plexus?",
+"options": ["C3-C7", "C5-T1", "C6-T2", "C4-C8", "C7-T2"],
+"correct": 1,
+"explanations": [
+"Incorrect. C3-C7 does not include T1, which is essential for the brachial plexus.",
+"Correct! The brachial plexus is formed by ventral rami of C5-T1.",
+"Incorrect. This range starts too low and misses C5.",
+"Incorrect. C4 may contribute via the dorsal scapular nerve but is not a main component.",
+"Incorrect. This range misses C5 and C6 which are crucial components."
+]
+}
 ]'></textarea>
-            <div class="button-group">
-                <button onclick="loadQuiz()">Load Quiz</button>
-                <button onclick="clearInput()">Clear</button>
-            </div>
-        </div>
+<div class="button-group">
+<button onclick="loadQuiz()">Load Quiz</button>
+<button onclick="clearInput()">Clear</button>
+</div>
+</div>
 
-        <div class="score-card" id="scoreCard">
-            <h2>Your Score</h2>
-            <div class="score-number" id="scoreNumber">0/0</div>
-            <p id="scoreMessage"></p>
-        </div>
-
-        <div class="mcq-container" id="mcqContainer"></div>
-
-        <div class="button-group" id="actionButtons" style="display: none;">
-            <button onclick="checkAnswers()">Check Answers</button>
-            <button onclick="resetQuiz()">New Quiz</button>
-        </div>
+    <div class="score-card" id="scoreCard">
+        <h2>Your Score</h2>
+        <div class="score-number" id="scoreNumber">0/0</div>
+        <p id="scoreMessage"></p>
     </div>
 
-    <script>
-        let mcqData = [];
-        let userAnswers = [];
-        let answered = false;
+    <div class="mcq-container" id="mcqContainer"></div>
 
-        function updatePrompt() {
-            const numQuestions = document.getElementById('numQuestions').value;
-            document.getElementById('promptNum').textContent = numQuestions;
-        }
+    <div class="button-group" id="actionButtons" style="display: none;">
+        <button onclick="checkAnswers()">Check Answers</button>
+        <button onclick="resetQuiz()">New Quiz</button>
+    </div>
+</div>
 
-        function copyPrompt() {
-            const promptText = document.getElementById('promptText').textContent;
-            navigator.clipboard.writeText(promptText).then(() => {
-                // Visual feedback
-                const button = event.target;
-                const originalText = button.textContent;
-                button.textContent = '✓ Copied!';
-                button.style.background = '#22c55e';
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = '';
-                }, 2000);
-            }).catch(err => {
-                alert('Failed to copy. Please select and copy manually.');
-            });
-        }
+<script>
+    let mcqData = [];
+    let userAnswers = [];
+    let answered = false;
 
-        function loadQuiz() {
-            let input = document.getElementById('jsonInput').value.trim();
+    function updatePrompt() {
+        const numQuestions = document.getElementById('numQuestions').value;
+        document.getElementById('promptNum').textContent = numQuestions;
+    }
+
+    function copyPrompt(button) {
+        const promptText = document.getElementById('promptText').textContent;
+        navigator.clipboard.writeText(promptText).then(() => {
+            // Visual feedback
+            const originalText = button.textContent;
+            const originalBackground = button.style.background;
+            button.textContent = '✓ Copied!';
+            button.style.background = '#22c55e';
             
-            if (!input) {
-                showError('Please paste JSON data first!');
-                return;
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = originalBackground;
+            }, 2000);
+        }).catch(err => {
+            alert('Failed to copy. Please select and copy manually. Error: ' + err);
+        });
+    }
+
+    function loadQuiz() {
+        let input = document.getElementById('jsonInput').value.trim();
+        
+        if (!input) {
+            showError('Please paste JSON data first!');
+            return;
+        }
+
+        // Clean up markdown code blocks if present
+        input = input.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+        try {
+            // Try to parse the JSON
+            mcqData = JSON.parse(input);
+            
+            // Validate structure
+            if (!Array.isArray(mcqData) || mcqData.length === 0) {
+                throw new Error('JSON must be an array with at least one question');
             }
-
-            // Clean up markdown code blocks if present
-            input = input.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-
-            try {
-                // Try to parse the JSON
-                mcqData = JSON.parse(input);
-                
-                // Validate structure
-                if (!Array.isArray(mcqData) || mcqData.length === 0) {
-                    throw new Error('JSON must be an array with at least one question');
+            
+            // Validate each question
+            mcqData.forEach((q, i) => {
+                if (!q.question || !q.options || !Array.isArray(q.options) || 
+                    q.correct === undefined || !q.explanations || !Array.isArray(q.explanations)) {
+                    throw new Error(`Question ${i + 1} is missing required fields`);
                 }
-                
-                // Validate each question
-                mcqData.forEach((q, i) => {
-                    if (!q.question || !q.options || !Array.isArray(q.options) || 
-                        q.correct === undefined || !q.explanations || !Array.isArray(q.explanations)) {
-                        throw new Error(`Question ${i + 1} is missing required fields`);
-                    }
-                    if (q.options.length !== 5) {
-                        throw new Error(`Question ${i + 1} must have exactly 5 options`);
-                    }
-                    if (q.explanations.length !== 5) {
-                        throw new Error(`Question ${i + 1} must have exactly 5 explanations`);
-                    }
-                });
-                
-                userAnswers = new Array(mcqData.length).fill(null);
-                answered = false;
-                
-                document.getElementById('errorMessage').classList.remove('show');
-                displayMCQs();
-                
-            } catch (error) {
-                showError('Invalid JSON format: ' + error.message);
-                console.error('Parse error:', error);
-            }
-        }
-
-        function displayMCQs() {
-            const container = document.getElementById('mcqContainer');
-            container.innerHTML = '';
+                if (q.options.length !== 5) {
+                    throw new Error(`Question ${i + 1} must have exactly 5 options`);
+                }
+                if (q.explanations.length !== 5) {
+                    throw new Error(`Question ${i + 1} must have exactly 5 explanations`);
+                }
+            });
             
-            mcqData.forEach((mcq, index) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'mcq-question';
-                questionDiv.innerHTML = `
-                    <div class="question-number">Question ${index + 1}</div>
-                    <div class="question-text">${mcq.question}</div>
-                    <div class="options" id="options-${index}">
-                        ${mcq.options.map((option, optIndex) => `
-                            <div class="option" onclick="selectOption(${index}, ${optIndex})" id="option-${index}-${optIndex}">
-                                <strong>${String.fromCharCode(65 + optIndex)}.</strong> ${option}
-                            </div>
-                        `).join('')}
+            userAnswers = new Array(mcqData.length).fill(null);
+            answered = false;
+            
+            document.getElementById('errorMessage').classList.remove('show');
+            displayMCQs();
+            
+        } catch (error) {
+            showError('Invalid JSON format: ' + error.message);
+            console.error('Parse error:', error);
+        }
+    }
+
+    function displayMCQs() {
+        const container = document.getElementById('mcqContainer');
+        container.innerHTML = '';
+        
+        mcqData.forEach((mcq, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'mcq-question';
+            questionDiv.innerHTML = `
+                <div class="question-number">Question ${index + 1}</div>
+                <div class="question-text">${mcq.question}</div>
+                <div class="options" id="options-${index}">
+                    ${mcq.options.map((option, optIndex) => `
+                        <div class="option" onclick="selectOption(${index}, ${optIndex})" id="option-${index}-${optIndex}">
+                            <strong>${String.fromCharCode(65 + optIndex)}.</strong> ${option}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="explanation-${index}">
+                    <div class="explanation-label">Explanation:</div>
+                    <div class="explanation-text" id="explanation-text-${index}"></div>
+                </div>
+            `;
+            container.appendChild(questionDiv);
+        });
+        
+        container.classList.add('show');
+        document.getElementById('actionButtons').style.display = 'flex';
+        document.getElementById('scoreCard').classList.remove('show');
+        
+        // Scroll to quiz
+        container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function selectOption(questionIndex, optionIndex) {
+        if (answered) return;
+        
+        // Clear previous selection
+        for (let i = 0; i < 5; i++) {
+            const opt = document.getElementById(`option-${questionIndex}-${i}`);
+            opt.classList.remove('selected');
+        }
+        
+        // Select new option
+        const option = document.getElementById(`option-${questionIndex}-${optionIndex}`);
+        option.classList.add('selected');
+        userAnswers[questionIndex] = optionIndex;
+    }
+
+    function checkAnswers() {
+        if (answered) return;
+        
+        let score = 0;
+        
+        mcqData.forEach((mcq, index) => {
+            const userAnswer = userAnswers[index];
+            const correctAnswer = mcq.correct;
+            
+            // Show all options as disabled
+            for (let i = 0; i < 5; i++) {
+                const opt = document.getElementById(`option-${index}-${i}`);
+                opt.classList.add('disabled');
+                opt.classList.remove('selected');
+                
+                if (i === correctAnswer) {
+                    opt.classList.add('correct');
+                } else if (i === userAnswer) {
+                    opt.classList.add('incorrect');
+                }
+            }
+            
+            // Show explanation for the user's selected answer AND the correct answer if wrong
+            let explanationHTML = '';
+            
+            if (userAnswer !== null && userAnswer !== correctAnswer) {
+                // User got it wrong - show both explanations
+                explanationHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: var(--incorrect);">Your answer (${String.fromCharCode(65 + userAnswer)}):</strong><br>
+                        ${mcq.explanations[userAnswer]}
                     </div>
-                    <div class="explanation" id="explanation-${index}">
-                        <div class="explanation-label">Explanation:</div>
-                        <div class="explanation-text" id="explanation-text-${index}"></div>
+                    <div>
+                        <strong style="color: var(--correct);">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
+                        ${mcq.explanations[correctAnswer]}
                     </div>
                 `;
-                container.appendChild(questionDiv);
-            });
-            
-            container.classList.add('show');
-            document.getElementById('actionButtons').style.display = 'flex';
-            document.getElementById('scoreCard').classList.remove('show');
-            
-            // Scroll to quiz
-            container.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function selectOption(questionIndex, optionIndex) {
-            if (answered) return;
-            
-            // Clear previous selection
-            for (let i = 0; i < 5; i++) {
-                const opt = document.getElementById(`option-${questionIndex}-${i}`);
-                opt.classList.remove('selected');
-            }
-            
-            // Select new option
-            const option = document.getElementById(`option-${questionIndex}-${optionIndex}`);
-            option.classList.add('selected');
-            userAnswers[questionIndex] = optionIndex;
-        }
-
-        function checkAnswers() {
-            if (answered) return;
-            
-            let score = 0;
-            
-            mcqData.forEach((mcq, index) => {
-                const userAnswer = userAnswers[index];
-                const correctAnswer = mcq.correct;
-                
-                // Show all options as disabled
-                for (let i = 0; i < 5; i++) {
-                    const opt = document.getElementById(`option-${index}-${i}`);
-                    opt.classList.add('disabled');
-                    opt.classList.remove('selected');
-                    
-                    if (i === correctAnswer) {
-                        opt.classList.add('correct');
-                    } else if (i === userAnswer) {
-                        opt.classList.add('incorrect');
-                    }
-                }
-                
-                // Show explanation for the user's selected answer AND the correct answer if wrong
-                let explanationHTML = '';
-                
-                if (userAnswer !== null && userAnswer !== correctAnswer) {
-                    // User got it wrong - show both explanations
-                    explanationHTML = `
-                        <div style="margin-bottom: 15px;">
-                            <strong style="color: #dc2626;">Your answer (${String.fromCharCode(65 + userAnswer)}):</strong><br>
-                            ${mcq.explanations[userAnswer]}
-                        </div>
-                        <div>
-                            <strong style="color: #15803d;">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
-                            ${mcq.explanations[correctAnswer]}
-                        </div>
-                    `;
-                } else if (userAnswer === correctAnswer) {
-                    // User got it right - show correct explanation
-                    explanationHTML = `
-                        <div>
-                            <strong style="color: #15803d;">✓ Correct!</strong><br>
-                            ${mcq.explanations[correctAnswer]}
-                        </div>
-                    `;
-                } else {
-                    // User didn't answer - show correct explanation
-                    explanationHTML = `
-                        <div>
-                            <strong style="color: #f59e0b;">No answer selected</strong><br>
-                            <strong>Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
-                            ${mcq.explanations[correctAnswer]}
-                        </div>
-                    `;
-                }
-                
-                document.getElementById(`explanation-text-${index}`).innerHTML = explanationHTML;
-                document.getElementById(`explanation-${index}`).classList.add('show');
-                
-                // Update score
-                if (userAnswer === correctAnswer) {
-                    score++;
-                }
-            });
-            
-            answered = true;
-            
-            // Show score card
-            const scoreCard = document.getElementById('scoreCard');
-            const scoreNumber = document.getElementById('scoreNumber');
-            const scoreMessage = document.getElementById('scoreMessage');
-            
-            scoreNumber.textContent = `${score}/${mcqData.length}`;
-            
-            const percentage = (score / mcqData.length) * 100;
-            if (percentage >= 90) {
-                scoreMessage.textContent = '🎉 Outstanding! Excellent work!';
-            } else if (percentage >= 70) {
-                scoreMessage.textContent = '👏 Good job! Keep it up!';
-            } else if (percentage >= 50) {
-                scoreMessage.textContent = '📚 Not bad, but review the material again.';
+            } else if (userAnswer === correctAnswer) {
+                // User got it right - show correct explanation
+                explanationHTML = `
+                    <div>
+                        <strong style="color: var(--correct);">✓ Correct!</strong><br>
+                        ${mcq.explanations[correctAnswer]}
+                    </div>
+                `;
             } else {
-                scoreMessage.textContent = '💪 Keep studying, you\'ll get there!';
+                // User didn't answer - show correct explanation
+                explanationHTML = `
+                    <div>
+                        <strong style="color: #f59e0b;">No answer selected</strong><br>
+                        <strong>Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong><br>
+                        ${mcq.explanations[correctAnswer]}
+                    </div>
+                `;
             }
             
-            scoreCard.classList.add('show');
-            scoreCard.scrollIntoView({ behavior: 'smooth' });
-        }
+            // Use CSS variables for strong tags for dark mode compatibility (good practice)
+            explanationHTML = explanationHTML.replace(/#dc2626/g, 'var(--incorrect)').replace(/#15803d/g, 'var(--correct)');
 
-        function resetQuiz() {
-            document.getElementById('inputSection').scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('mcqContainer').classList.remove('show');
-            document.getElementById('scoreCard').classList.remove('show');
-            document.getElementById('actionButtons').style.display = 'none';
-            document.getElementById('jsonInput').value = '';
-            mcqData = [];
-            userAnswers = [];
-            answered = false;
-        }
-
-        function clearInput() {
-            document.getElementById('jsonInput').value = '';
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 5000);
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const icon = document.getElementById('darkIcon');
+            document.getElementById(`explanation-text-${index}`).innerHTML = explanationHTML;
+            document.getElementById(`explanation-${index}`).classList.add('show');
             
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('darkMode', 'enabled');
-                icon.textContent = '☀️';
-            } else {
-                localStorage.setItem('darkMode', 'disabled');
-                icon.textContent = '🌙';
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const darkMode = localStorage.getItem('darkMode');
-            if (darkMode === 'enabled') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkIcon').textContent = '☀️';
+            // Update score
+            if (userAnswer === correctAnswer) {
+                score++;
             }
         });
-    </script>
+        
+        answered = true;
+        
+        // Show score card
+        const scoreCard = document.getElementById('scoreCard');
+        const scoreNumber = document.getElementById('scoreNumber');
+        const scoreMessage = document.getElementById('scoreMessage');
+        
+        scoreNumber.textContent = `${score}/${mcqData.length}`;
+        
+        const percentage = (score / mcqData.length) * 100;
+        if (percentage >= 90) {
+            scoreMessage.textContent = '🎉 Outstanding! Excellent work!';
+        } else if (percentage >= 70) {
+            scoreMessage.textContent = '👏 Good job! Keep it up!';
+        } else if (percentage >= 50) {
+            scoreMessage.textContent = '📚 Not bad, but review the material again.';
+        } else {
+            scoreMessage.textContent = '💪 Keep studying, you\'ll get there!';
+        }
+        
+        scoreCard.classList.add('show');
+        scoreCard.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetQuiz() {
+        document.getElementById('inputSection').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('mcqContainer').classList.remove('show');
+        document.getElementById('scoreCard').classList.remove('show');
+        document.getElementById('actionButtons').style.display = 'none';
+        document.getElementById('jsonInput').value = '';
+        mcqData = [];
+        userAnswers = [];
+        answered = false;
+    }
+
+    function clearInput() {
+        document.getElementById('jsonInput').value = '';
+    }
+
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.textContent = message;
+        errorDiv.classList.add('show');
+        setTimeout(() => errorDiv.classList.remove('show'), 5000);
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const icon = document.getElementById('darkIcon');
+        
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+            icon.textContent = '☀️';
+        } else {
+            localStorage.setItem('darkMode', 'disabled');
+            icon.textContent = '🌙';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const darkMode = localStorage.getItem('darkMode');
+        if (darkMode === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkIcon').textContent = '☀️';
+        }
+    });
+</script>
+
 </body>
 </html>
