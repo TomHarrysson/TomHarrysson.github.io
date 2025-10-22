@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Short Answer Quiz Tool | Tom Harrysson</title>
+    <style>
+        :root {
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #cbd5e1;
+            --bg-gradient-end: #94a3b8;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --header-content-text: #1e293b;
+            --section-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --accent-primary: #0891b2;
+            --correct: #15803d;
+            --partial: #ca8a04;
+            --info-box-text: #78350f;
+            --info-box-h3: #92400e;
+            --script-bg: #fef3c7;
+            --script-border: #f59e0b;
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-mid: #1e293b;
+            --bg-gradient-end: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --card-bg: rgba(51, 65, 85, 0.95);
+            --header-content-text: #f8fafc;
+            --section-bg: #475569;
+            --border-color: #64748b;
+            --accent-primary: #06b6d4;
+            --correct: #22c55e;
+            --partial: #fbbf24;
+            --info-box-text: #fde68a;
+            --info-box-h3: #fde68a;
+            --script-bg: #78350f;
+            --script-border: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            color: var(--header-content-text);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: var(--text-primary);
+            opacity: 0.8;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .dark-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: var(--section-bg);
+            border-radius: 12px;
+        }
+
+        .section h2 {
+            color: var(--header-content-text);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 10px;
+        }
+
+        .info-box {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        body.dark-mode .info-box {
+            background: #78350f;
+            border-left-color: #fbbf24;
+        }
+
+        .info-box h3 {
+            color: var(--info-box-h3);
+            margin-bottom: 10px;
+        }
+        
+        .info-box ol, .info-box ul {
+            color: var(--info-box-text);
+            line-height: 1.8;
+            margin-left: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        button, .file-upload-label {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent-primary), #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        button:hover:not(:disabled), .file-upload-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        #uploadFile {
+            display: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        body.dark-mode .error-message {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .quiz-container {
+            display: none;
+        }
+
+        .quiz-container.show {
+            display: block;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .question-number {
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--header-content-text);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .illness-script {
+            background: var(--script-bg);
+            border-left: 4px solid var(--script-border);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .illness-script h4 {
+            color: var(--info-box-h3);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .illness-script-content {
+            color: var(--info-box-text);
+            line-height: 1.6;
+        }
+
+        .illness-script-content strong {
+            display: block;
+            margin-top: 8px;
+        }
+
+        .illness-script-content strong:first-child {
+            margin-top: 0;
+        }
+
+        .part-question {
+            background: var(--section-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--border-color);
+        }
+
+        .part-label {
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-family: 'Georgia', serif;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .model-answer {
+            background: #dcfce7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid var(--correct);
+            display: none;
+        }
+
+        body.dark-mode .model-answer {
+            background: #14532d;
+        }
+
+        .model-answer.show {
+            display: block;
+        }
+
+        .model-answer-label {
+            font-weight: 700;
+            color: var(--correct);
+            margin-bottom: 8px;
+        }
+
+        .model-answer-text {
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .key-points {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .key-points h5 {
+            color: var(--correct);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .key-points ul {
+            margin-left: 20px;
+            color: var(--text-primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .score-card {
+            background: var(--section-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .score-card.show {
+            display: block;
+        }
+
+        .score-message {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="darkToggle" class="dark-toggle">
+        <span id="darkIcon">🌙</span>
+    </button>
+
+    <div class="container">
+        <a href="extra.html" class="back-link">← Back to Tools</a>
+        
+        <h1>📝 Short Answer Quiz Tool</h1>
+        <p class="subtitle">Test your clinical reasoning and knowledge recall!</p>
+
+        <div class="info-box">
+            <h3>📋 How to Use:</h3>
+            <ol>
+                <li>Copy the prompt below and paste it into ChatGPT</li>
+                <li>Add your study material to ChatGPT</li>
+                <li>Copy the JSON output from ChatGPT</li>
+                <li>Paste it below or upload the file</li>
+                <li>Answer the questions and check your responses!</li>
+            </ol>
+            <h3 style="margin-top: 15px;">✨ Features:</h3>
+            <ul>
+                <li><strong>Illness Scripts:</strong> Questions can include clinical scenarios with patient presentations</li>
+                <li><strong>Multi-part Questions:</strong> Break complex topics into manageable parts</li>
+                <li><strong>Model Answers:</strong> Compare your responses with detailed explanations</li>
+                <li><strong>Key Points:</strong> Highlight the most important concepts to remember</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Step 1: Choose Number of Questions</h2>
+            <div style="margin-bottom: 20px;">
+                <label for="numQuestions" style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-primary);">How many questions do you want?</label>
+                <select id="numQuestions" style="width: 200px; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; background: var(--card-bg); color: var(--text-primary);">
+                    <option value="5" selected>5 Questions</option>
+                    <option value="10">10 Questions</option>
+                    <option value="15">15 Questions</option>
+                    <option value="20">20 Questions</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Step 2: Copy ChatGPT Prompt</h2>
+            <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this prompt and paste it into ChatGPT with your study material:</p>
+            <button id="copyPromptBtn" style="margin-bottom: 10px; width: 100%;">
+                📋 Copy Prompt to Clipboard
+            </button>
+            <div style="position: relative;">
+                <pre id="promptText" style="background: var(--section-bg); padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">Create <span id="promptNum">5</span> short answer questions based on the following medical material. Format your response as a JSON array INSIDE A CODE BLOCK for easy copying.
+
+Use this exact format (include the ```json code block):
+
+```json
+[
+  {
+    "question": "Your question text here",
+    "illnessScript": {
+      "presentation": "Patient presentation (optional)",
+      "demographics": "Age, sex, relevant history (optional)",
+      "symptoms": "Key symptoms and timeline (optional)",
+      "examination": "Physical exam findings (optional)"
+    },
+    "parts": [
+      {
+        "label": "Part a)",
+        "question": "First part of the question",
+        "modelAnswer": "Detailed model answer",
+        "keyPoints": ["Key point 1", "Key point 2", "Key point 3"]
+      }
+    ]
+  }
+]
+```
+
+Rules:
+
+1. Each question can have:
+   - A main question stem
+   - An optional "illnessScript" object with clinical scenario (for case-based questions)
+   - One or more "parts" (use parts for multi-part questions, or single part for simple questions)
+
+2. For illness scripts, include:
+   - presentation: Brief clinical scenario
+   - demographics: Patient age, sex, relevant history
+   - symptoms: Key presenting symptoms
+   - examination: Relevant physical exam findings
+   - (All fields are optional - only include if relevant)
+
+3. Each part should have:
+   - label: "Part a)", "Part b)", etc.
+   - question: The specific question to answer
+   - modelAnswer: Comprehensive answer with explanation
+   - keyPoints: Array of 3-5 key learning points
+
+4. Question types can include:
+   - Case-based clinical reasoning (with illness script)
+   - Pathophysiology explanations
+   - Differential diagnosis
+   - Management planning
+   - Mechanism of action
+   - Anatomy and physiology
+
+5. Make questions challenging but fair
+6. Model answers should be detailed and educational
+7. IMPORTANT: Put your response in a ```json code block
+
+My study material:
+[PASTE YOUR NOTES HERE]</pre>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="section" id="inputSection">
+            <h2>Step 3: Paste JSON or Upload File</h2>
+            <textarea id="jsonInput" placeholder='Paste the JSON here (you can paste the whole code block from ChatGPT):
+
+Example:
+[
+  {
+    "question": "A 65-year-old man presents with acute chest pain. Describe the pathophysiology of acute coronary syndrome.",
+    "parts": [
+      {
+        "label": "Part a)",
+        "question": "Explain the pathophysiology of plaque rupture",
+        "modelAnswer": "Plaque rupture occurs when...",
+        "keyPoints": ["Endothelial dysfunction", "Inflammatory response", "Thrombosis cascade"]
+      }
+    ]
+  }
+]'></textarea>
+            <div class="button-group">
+                <button id="loadQuizBtn">Load Quiz</button>
+                <label for="uploadFile" class="file-upload-label">Upload File</label>
+                <input type="file" id="uploadFile" accept=".json, .txt">
+                <button id="clearBtn">Clear</button>
+            </div>
+        </div>
+
+        <div class="score-card" id="scoreCard">
+            <h2>✅ All answers revealed!</h2>
+            <p class="score-message">Compare your responses with the model answers above. Focus on the key points to strengthen your understanding.</p>
+        </div>
+
+        <div class="quiz-container" id="quizContainer"></div>
+
+        <div class="button-group" id="actionButtons" style="display: none;">
+            <button id="revealAnswersBtn">Reveal All Answers</button>
+            <button id="downloadJsonBtn" disabled>Download JSON</button>
+            <button id="resetQuizBtn">New Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        let quizData = [];
+        let revealed = false;
+
+        function updatePrompt() {
+            const numQuestions = document.getElementById('numQuestions').value;
+            document.getElementById('promptNum').textContent = numQuestions;
+        }
+
+        function copyPrompt(button) {
+            const promptText = document.getElementById('promptText').textContent;
+            navigator.clipboard.writeText(promptText).then(() => {
+                const originalText = button.textContent;
+                const originalBackground = button.style.background;
+                button.textContent = '✓ Copied!';
+                button.style.background = '#22c55e';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = originalBackground;
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually. Error: ' + err);
+            });
+        }
+
+        function loadQuiz() {
+            let input = document.getElementById('jsonInput').value.trim();
+            
+            if (!input) {
+                showError('Please paste or upload JSON data first!');
+                return;
+            }
+
+            input = input.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+            try {
+                quizData = JSON.parse(input);
+                
+                if (!Array.isArray(quizData) || quizData.length === 0) {
+                    throw new Error('JSON must be an array with at least one question');
+                }
+                
+                quizData.forEach((q, i) => {
+                    if (!q.question || !q.parts || !Array.isArray(q.parts) || q.parts.length === 0) {
+                        throw new Error(`Question ${i + 1} is missing required fields (question, parts)`);
+                    }
+                    
+                    q.parts.forEach((part, partIndex) => {
+                        if (!part.label || !part.question || !part.modelAnswer) {
+                            throw new Error(`Question ${i + 1}, Part ${partIndex + 1} is missing required fields`);
+                        }
+                    });
+                });
+                
+                revealed = false;
+                
+                document.getElementById('errorMessage').classList.remove('show');
+                document.getElementById('downloadJsonBtn').disabled = false;
+                displayQuiz();
+                
+            } catch (error) {
+                showError('Invalid JSON format: ' + error.message);
+                console.error('Parse error:', error);
+                document.getElementById('downloadJsonBtn').disabled = true;
+            }
+        }
+
+        function displayQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+            
+            quizData.forEach((item, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+                
+                let html = `
+                    <div class="question-number">Question ${index + 1}</div>
+                    <div class="question-text">${item.question}</div>
+                `;
+                
+                if (item.illnessScript && Object.keys(item.illnessScript).length > 0) {
+                    html += `<div class="illness-script">
+                        <h4>📋 Clinical Scenario</h4>
+                        <div class="illness-script-content">`;
+                    
+                    if (item.illnessScript.presentation) {
+                        html += `<strong>Presentation:</strong> ${item.illnessScript.presentation}`;
+                    }
+                    if (item.illnessScript.demographics) {
+                        html += `<strong>Demographics:</strong> ${item.illnessScript.demographics}`;
+                    }
+                    if (item.illnessScript.symptoms) {
+                        html += `<strong>Symptoms:</strong> ${item.illnessScript.symptoms}`;
+                    }
+                    if (item.illnessScript.examination) {
+                        html += `<strong>Examination:</strong> ${item.illnessScript.examination}`;
+                    }
+                    
+                    html += `</div></div>`;
+                }
+                
+                item.parts.forEach((part, partIndex) => {
+                    html += `
+                        <div class="part-question">
+                            <div class="part-label">${part.label}</div>
+                            <div style="margin-bottom: 10px; color: var(--text-primary);">${part.question}</div>
+                            <textarea class="answer-input" id="answer-${index}-${partIndex}" placeholder="Type your answer here..."></textarea>
+                            
+                            <div class="model-answer" id="model-${index}-${partIndex}">
+                                <div class="model-answer-label">✓ Model Answer</div>
+                                <div class="model-answer-text">${part.modelAnswer}</div>
+                                ${part.keyPoints && part.keyPoints.length > 0 ? `
+                                    <div class="key-points">
+                                        <h5>🔑 Key Points:</h5>
+                                        <ul>
+                                            ${part.keyPoints.map(point => `<li>${point}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                questionDiv.innerHTML = html;
+                container.appendChild(questionDiv);
+            });
+            
+            container.classList.add('show');
+            document.getElementById('actionButtons').style.display = 'flex';
+            document.getElementById('scoreCard').classList.remove('show');
+            
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function revealAnswers() {
+            if (revealed) return;
+            
+            quizData.forEach((item, qIndex) => {
+                item.parts.forEach((part, pIndex) => {
+                    document.getElementById(`model-${qIndex}-${pIndex}`).classList.add('show');
+                });
+            });
+            
+            revealed = true;
+            
+            document.getElementById('scoreCard').classList.add('show');
+            document.getElementById('scoreCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            document.getElementById('inputSection').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('quizContainer').classList.remove('show');
+            document.getElementById('scoreCard').classList.remove('show');
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('uploadFile').value = '';
+            document.getElementById('downloadJsonBtn').disabled = true;
+            quizData = [];
+            revealed = false;
+        }
+
+        function clearInput() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('uploadFile').value = '';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 5000);
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('darkIcon');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+                icon.textContent = '☀️';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                icon.textContent = '🌙';
+            }
+        }
+
+        function downloadJson() {
+            if (quizData.length === 0) return;
+
+            const jsonString = JSON.stringify(quizData, null, 2);
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const date = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `short-answer-quiz-${date}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                document.getElementById('jsonInput').value = text;
+                loadQuiz();
+            };
+            reader.onerror = function(e) {
+                showError("Error reading file.");
+                console.error("File reading error", e);
+            };
+            reader.readAsText(file);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkIcon').textContent = '☀️';
+            }
+
+            document.getElementById('darkToggle').addEventListener('click', toggleDarkMode);
+            document.getElementById('numQuestions').addEventListener('change', updatePrompt);
+            document.getElementById('copyPromptBtn').addEventListener('click', function() { copyPrompt(this); });
+            document.getElementById('loadQuizBtn').addEventListener('click', loadQuiz);
+            document.getElementById('clearBtn').addEventListener('click', clearInput);
+            document.getElementById('revealAnswersBtn').addEventListener('click', revealAnswers);
+            document.getElementById('resetQuizBtn').addEventListener('click', resetQuiz);
+            document.getElementById('downloadJsonBtn').addEventListener('click', downloadJson);
+            document.getElementById('uploadFile').addEventListener('change', handleFileUpload);
+        });
+    </script>
+</body>
+</html>
