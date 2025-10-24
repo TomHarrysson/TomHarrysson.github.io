@@ -122,9 +122,7 @@
       display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--section-bg);
       border: 1px solid var(--border-color); font-size: .8rem; color: var(--text-muted); margin-right: 6px;
     }
-    .helper {
-      font-size: .9rem; color: var(--text-muted); margin-top: 6px;
-    }
+    .helper { font-size: .9rem; color: var(--text-muted); margin-top: 14px; line-height: 1.7; }
     .muted { opacity: .8; color: var(--text-secondary); }
     .success { color: var(--success); }
     .warn { color: var(--warn); }
@@ -158,10 +156,10 @@
         <li>Choose card mode (<strong>Cloze</strong> recommended), cloze aggressiveness, and tags.</li>
         <li>Click <em>Copy Prompt</em> and paste it into ChatGPT with your source content (slides/paragraphs, etc.).</li>
         <li>Copy the JSON output from ChatGPT (whole code block is fine).</li>
-        <li>Paste it below or upload the file. Preview cards, then export as <strong>TSV</strong> for Anki.</li>
+        <li>Paste it below or upload the file. Preview cards (Reveal shows answers/hints), then export as <strong>TSV</strong> for Anki.</li>
         <li>In Anki, import the TSV and select the <strong>Cloze</strong> (or <strong>Basic</strong>) note type.</li>
       </ol>
-      <p class="helper tiny">Tip: For medical content, prefer Cloze + Moderate/Smart aggressiveness to keep deletions targeted.</p>
+      <p class="helper tiny">Tip: Keep relevant clarifications in the <strong>Extra</strong> field—mnemonics, disambiguators, or short differentials for context.</p>
     </div>
 
     <!-- Config -->
@@ -174,7 +172,7 @@
             <option value="cloze" selected>Cloze (recommended)</option>
             <option value="basic">Basic (Front/Back)</option>
           </select>
-          <p class="helper">Cloze text like: <span class="cloze-chip">{{c1::Bohr effect}}</span></p>
+          <p class="helper">Cloze text like: <span class="cloze-chip">{{c1::Bohr effect::right-shift}}</span></p>
         </div>
         <div id="clozeAggWrap">
           <label for="clozeAgg">Cloze Aggressiveness</label>
@@ -186,9 +184,9 @@
           <p class="helper">Controls how dense the clozes should be.</p>
         </div>
         <div>
-          <label for="tagInput">Tags (optional, space or comma separated)</label>
+          <label for="tagInput">Tags (space or comma separated)</label>
           <input type="text" id="tagInput" placeholder="e.g. cardio heme respiratory"/>
-          <p class="helper">Applied to every card in the export.</p>
+          <p class="helper">Only these tags will be applied to every card. (Per-card tags from ChatGPT are ignored.)</p>
         </div>
         <div>
           <label for="cardLimit">Max Cards</label>
@@ -263,13 +261,11 @@
     function getGlobalTags(){
       const raw = qs('tagInput').value.trim();
       if(!raw) return [];
-      return raw.split(/[,\\s]+/).filter(Boolean);
+      return raw.split(/[,\s]+/).filter(Boolean);
     }
     function sanitizeFences(txt){
-      return txt.replace(/```json\\s*/gi,'').replace(/```\\s*/g,'').trim();
+      return txt.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
     }
-    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
-    function asArray(x){ return Array.isArray(x)?x:(x? [x] : []); }
 
     // ---------- Prompt Builder ----------
     function buildPrompt(){
@@ -285,14 +281,59 @@
       }[agg];
 
       const baseRules = `
-General rules:
-- Output strictly as a JSON array ONLY inside a \\\`\\\`\\\`json code block.
+General rules (output strictly as JSON array inside a \`\`\`json code block):
 - Do not exceed ${limit} cards.
-- Use concise, self-contained phrasing. Avoid duplicating the same fact.
-- Prefer high-yield material; skip trivia.
-- Provide helpful "extra" notes only if valuable (concise).
-- Keep unicode symbols and subscripts as-is.
+- Produce self-contained, unambiguous cards.
+- Use the Minimal Information Principle; one atomic fact per cloze.
+- Prefer high-yield material; skip trivia and long lists unless core.
+- Use concise phrasing; keep context sufficient for recall.
+- Include an optional "extra" field for short clarifications/mnemonics only when helpful.
+- **Do not include a tags array**. Tags are applied by my website.
+`;
 
+      const goodAnki = `
+
+🧠 CLOZE CARD RULESET (Concise)
+
+Core Principle:
+Each cloze tests one atomic, high-yield fact with enough—but not excessive—context to allow precise recall without guesswork.
+
+1) Context Balance
+- Provide just enough context to be answerable but not guessable.
+- Too little → ambiguity; too much → giveaway.
+- Ideal: “{{c1::ADH}} increases water reabsorption in the collecting duct.”
+
+2) Minimal Information
+- One fact per cloze; split related facts. Retrieval <5s.
+
+3) Self-contained
+- Full sentence(s) that make sense alone; avoid pronouns like “it/this”.
+
+4) Clarity
+- Clean sentences; avoid obscure abbreviations; prefer cause→effect/mechanism→outcome.
+
+5) Relevance
+- High-yield only; skip trivia and long lists unless core.
+
+6) Hint System
+- Use hints only when multiple plausible answers exist; hints specify the category/type, not the identity.
+- Syntax: {{c1::answer::hint}}.
+- Good: {{c1::ADH::hormone}} acts on the distal nephron.
+- Don’t use hints when context already makes the target unambiguous or when hint restates the answer or makes it obvious.
+
+7) Structure
+- Number clozes sequentially (c1, c2, c3), no overlaps, cloze whole terms/phrases.
+
+8) Extra Field
+- Use \"extra\" only for short mnemonics/clarifications/exceptions; never add new lists or unrelated facts.
+
+9) Simplicity
+- Short, declarative, readable.
+
+10) Quality Check
+- Is recall dependent on knowing the fact (not deduction)?
+- One atomic target? Enough but not excessive context?
+- Would a hint help without giving it away? High-yield, <5s recall?
 `;
 
       let schemaText = '';
@@ -301,46 +342,38 @@ General rules:
 Cloze card schema (array of objects):
 [
   {
-    "text": "Full sentence(s) with {{c1::target}} cloze(s). Multiple deletions allowed (c1, c2...).",
-    "extra": "Optional extra context / mnemonic",
-    "tags": ["optional","topic","subtopic"]
+    "text": "Full sentence(s) with {{c1::target}} cloze(s). Optional hints: {{c2::target::short hint}}.",
+    "extra": "Optional extra context / mnemonic"
   }
 ]
 
 Cloze quality guidance:
 - ${aggressivenessText}
-- Prefer whole-term clozes (not partial letters).
-- Don't cloze the same fact more than once.
-- If a sentence needs multiple clozes, number them c1, c2, c3... in reading order.
-- Avoid creating more than ~3 clozes per sentence unless truly necessary.
+- Do not repeat the same fact with multiple clozes.
 `;
       } else {
         schemaText = `
 Basic card schema (array of objects):
 [
   {
-    "front": "Question or prompt",
-    "back": "Clear, precise answer",
-    "extra": "Optional extra context / mnemonic",
-    "tags": ["optional","topic","subtopic"]
+    "front": "Question or prompt (specific)",
+    "back": "Clear, unique best answer",
+    "extra": "Optional extra context / mnemonic"
   }
 ]
 
 Basic quality guidance:
-- Make the front specific; the back should be the unique best answer.
-- Avoid multi-part answers; split into separate cards if needed.
+- Split multi-part answers into separate cards.
+- Keep the back concise and precise.
 `;
       }
 
-      const tagNote = sharedTags ? `\nFinal note: Please include these global tags on each card in the "tags" array as well: ${sharedTags}\n` : '';
+      const tagNote = sharedTags ? `\n(Website will apply these tags to every card: ${sharedTags})\n` : '';
 
       const prompt = `You are generating high-yield ${mode === 'cloze' ? 'Cloze' : 'Basic'} Anki flashcards from the content I provide.
-
-${baseRules}${schemaText}
-
-Now read the content below and produce the JSON as specified. Respond ONLY with the JSON array inside a \\\`\\\`\\\`json code block.
-
-[PASTE YOUR CONTENT BELOW THIS LINE]
+\n${baseRules}${goodAnki}${schemaText}${tagNote}
+Now read the content below and produce ONLY the JSON array inside a \`\`\`json code block.
+\n[PASTE YOUR CONTENT BELOW THIS LINE]
 `;
       qs('promptText').textContent = prompt;
     }
@@ -371,20 +404,17 @@ Now read the content below and produce the JSON as specified. Respond ONLY with 
 
     // ---------- Parsing & Normalization ----------
     function normalizeInput(json){
-      // Accepts either Cloze schema or Basic schema as defined in the prompt.
-      const sharedTags = getGlobalTags();
+      const sharedTags = getGlobalTags(); // apply ONLY these; ignore per-item tags
       const out = [];
       json.forEach((item, idx)=>{
         if(qs('mode').value === 'cloze'){
           if(!item.text) throw new Error(`Item ${idx+1}: missing "text"`);
           const extra = item.extra || "";
-          const tags = [...new Set([...(item.tags||[]), ...sharedTags])];
-          out.push({ type: 'cloze', text: String(item.text), extra: String(extra), tags });
+          out.push({ type: 'cloze', text: String(item.text), extra: String(extra), tags: sharedTags.slice() });
         } else {
           if(!item.front || !item.back) throw new Error(`Item ${idx+1}: missing "front" or "back"`);
           const extra = item.extra || "";
-          const tags = [...new Set([...(item.tags||[]), ...sharedTags])];
-          out.push({ type: 'basic', front: String(item.front), back: String(item.back), extra: String(extra), tags });
+          out.push({ type: 'basic', front: String(item.front), back: String(item.back), extra: String(extra), tags: sharedTags.slice() });
         }
       });
       return out;
@@ -456,20 +486,24 @@ Now read the content below and produce the JSON as specified. Respond ONLY with 
     }
 
     function escapeHTML(s){
-      return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-              .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+      return String(s)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
     }
 
     function renderClozeHTML(text){
-      // Show masked clozes with a toggle
+      // Show masked clozes with a toggle; capture optional hint
       // Matches {{cN::answer}} or {{cN::answer::hint}}
-      const regex = /\\{\\{c(\\d+)::(.*?)(?:::.*?|)\\}\\}/g;
+      const regex = /\{\{c(\d+)::(.*?)(?:::(.*?))?\}\}/g;
       let idx = 0;
-      return escapeHTML(text).replace(regex, (m, n, ans)=>{
+      return escapeHTML(text).replace(regex, (m, n, ans, hint)=>{
         const mask = '▮▮▮';
         const id = 'cz_'+(idx++);
-        // The content is escaped, so store answers in data-* and render spans we can toggle.
-        return `<span class="cloze-chip" data-id="${id}" data-answer="${escapeHTML(ans)}" data-mask="${mask}" data-answer-shown="0">${mask}</span><button class="reveal tiny">Reveal</button>`;
+        const safeHint = hint ? ` title="Hint: ${escapeHTML(hint)}"` : '';
+        return `<span class="cloze-chip" data-id="${id}" data-answer="${escapeHTML(ans)}" data-mask="${mask}" data-answer-shown="0">${mask}</span><button class="reveal tiny"${safeHint}>Reveal</button>`;
       });
     }
 
@@ -482,15 +516,11 @@ Now read the content below and produce the JSON as specified. Respond ONLY with 
       let tsv = '';
       const tagJoin = (tags) => (tags||[]).join(' ');
       if(cards[0].type === 'cloze'){
-        tsv = cards.map(c => [
-          c.text, (c.extra||''), tagJoin(c.tags)
-        ].join('\\t')).join('\\n');
-        downloadFile(tsv, 'anki-cloze', 'txt');
+        tsv = cards.map(c => [ c.text, (c.extra||''), tagJoin(c.tags) ].join('\t')).join('\n');
+        downloadFile(tsv, 'anki-cloze', 'tsv', 'text/tab-separated-values;charset=utf-8');
       } else {
-        tsv = cards.map(c => [
-          c.front, c.back, (c.extra||''), tagJoin(c.tags)
-        ].join('\\t')).join('\\n');
-        downloadFile(tsv, 'anki-basic', 'txt');
+        tsv = cards.map(c => [ c.front, c.back, (c.extra||''), tagJoin(c.tags) ].join('\t')).join('\n');
+        downloadFile(tsv, 'anki-basic', 'tsv', 'text/tab-separated-values;charset=utf-8');
       }
     }
 
@@ -519,7 +549,7 @@ Now read the content below and produce the JSON as specified. Respond ONLY with 
         qs('jsonInput').value = ev.target.result;
         parseAndLoad();
       };
-      reader.onerror = (ev)=> showError('Error reading file.');
+      reader.onerror = ()=> showError('Error reading file.');
       reader.readAsText(file);
     }
 
