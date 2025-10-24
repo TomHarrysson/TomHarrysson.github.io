@@ -1,44 +1,561 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcard Generator - Coming Soon</title>
-    <style>
-        body {
-            font-family: Georgia, serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #e2e8f0, #cbd5e1, #94a3b8);
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        h1 { color: #1e293b; }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: #0891b2;
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flashcard Generator | Tom Harrysson</title>
+  <style>
+    :root {
+      --bg-gradient-start: #e2e8f0;
+      --bg-gradient-mid: #cbd5e1;
+      --bg-gradient-end: #94a3b8;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --card-bg: rgba(255,255,255,0.95);
+      --header-content-text: #1e293b;
+      --section-bg: #f8fafc;
+      --border-color: #e2e8f0;
+      --accent-primary: #0891b2;
+      --info-box-text: #78350f;
+      --info-box-h3: #92400e;
+      --success: #15803d;
+      --warn: #b45309;
+      --danger: #dc2626;
+    }
+    body.dark-mode {
+      --bg-gradient-start: #0f172a;
+      --bg-gradient-mid: #1e293b;
+      --bg-gradient-end: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #e2e8f0;
+      --text-muted: #cbd5e1;
+      --card-bg: rgba(51,65,85,0.95);
+      --header-content-text: #f8fafc;
+      --section-bg: #475569;
+      --border-color: #64748b;
+      --accent-primary: #06b6d4;
+      --info-box-text: #fde68a;
+      --info-box-h3: #fde68a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Georgia", serif;
+      background: linear-gradient(135deg,var(--bg-gradient-start) 0%,var(--bg-gradient-mid) 50%,var(--bg-gradient-end) 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--text-primary);
+      transition: all .3s ease;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.1);
+    }
+    .dark-toggle {
+      position: absolute; top: 20px; right: 20px;
+      background: var(--card-bg); border: none; border-radius: 50%;
+      width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem;
+    }
+    a.back-link {
+      display: inline-block; margin-bottom: 20px; color: var(--accent-primary);
+      text-decoration: none; font-weight: 600;
+    }
+    a.back-link:hover { text-decoration: underline; }
+    h1 { color: var(--header-content-text); font-size: 2rem; margin-bottom: 10px; text-align: center; }
+    .subtitle { color: var(--text-primary); opacity: .8; text-align: center; margin-bottom: 30px; }
+
+    .section {
+      margin-bottom: 30px; padding: 25px; background: var(--section-bg); border-radius: 12px;
+    }
+    .section h2 {
+      color: var(--header-content-text); font-size: 1.5rem; margin-bottom: 20px;
+      border-bottom: 2px solid var(--accent-primary); padding-bottom: 10px;
+    }
+    .info-box {
+      background: #fef3c7; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;
+    }
+    body.dark-mode .info-box { background: #78350f; border-left-color: #fbbf24; }
+    .info-box h3 { color: var(--info-box-h3); margin-bottom: 10px; }
+    .info-box ol, .info-box p { color: var(--info-box-text); line-height: 1.7; margin-left: 20px; }
+
+    label { font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 8px; }
+    select, input[type="text"] {
+      width: 100%; max-width: 420px; padding: 10px; border: 2px solid var(--border-color);
+      border-radius: 8px; font-size: 1rem; background: var(--card-bg); color: var(--text-primary);
+    }
+    textarea {
+      width: 100%; padding: 15px; border: 2px solid var(--border-color);
+      border-radius: 8px; font-size: 1rem; background: var(--card-bg); color: var(--text-primary);
+      font-family: "Courier New", monospace; min-height: 200px; resize: vertical;
+    }
+    button, .file-upload-label {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--accent-primary), #06b6d4);
+      color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+      transition: all .3s ease; font-size: 1rem; margin-right: 10px; display: inline-block;
+    }
+    button:hover:not(:disabled), .file-upload-label:hover {
+      transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
+    button:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+    #uploadFile { display: none; }
+
+    .button-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .error-message {
+      background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none;
+    }
+    body.dark-mode .error-message { background: #7f1d1d; color: #fca5a5; }
+    .error-message.show { display: block; }
+
+    .preview { display: none; }
+    .preview.show { display: block; }
+    .card {
+      background: var(--card-bg); padding: 18px; border-radius: 12px; margin-bottom: 14px; border-left: 4px solid var(--accent-primary);
+    }
+    .card h4 { margin-bottom: 10px; }
+    .card .text { line-height: 1.7; }
+    .pill {
+      display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--section-bg);
+      border: 1px solid var(--border-color); font-size: .8rem; color: var(--text-muted); margin-right: 6px;
+    }
+    .helper {
+      font-size: .9rem; color: var(--text-muted); margin-top: 6px;
+    }
+    .muted { opacity: .8; color: var(--text-secondary); }
+    .success { color: var(--success); }
+    .warn { color: var(--warn); }
+    .danger { color: var(--danger); }
+    .tiny { font-size: .85rem; }
+
+    pre.prompt {
+      background: var(--section-bg); padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;
+    }
+    .cloze-chip { background: #fde68a; padding: 0 4px; border-radius: 4px; }
+    body.dark-mode .cloze-chip { background: #78350f; }
+    .reveal {
+      background: transparent; color: var(--accent-primary); border: 1px dashed var(--accent-primary);
+      padding: 4px 8px; border-radius: 8px; margin-left: 8px;
+    }
+    .reveal:hover { transform: none; box-shadow: none; }
+    .tagline { text-align: center; margin-top: 16px; color: var(--text-muted); }
+    @media (max-width: 768px) { .container { padding: 20px; } }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📚 Flashcard Generator</h1>
-        <p>Coming Soon!</p>
-        <a href="extra.html">← Back to Games & Tools</a>
+  <button id="darkToggle" class="dark-toggle"><span id="darkIcon">🌙</span></button>
+  <div class="container">
+    <a href="extra.html" class="back-link">← Back to Tools</a>
+    <h1>🧠 Flashcard Generator</h1>
+    <p class="subtitle">Build high-yield Anki cards from any text, lecture notes, or slides.</p>
+
+    <div class="info-box">
+      <h3>📋 How this works</h3>
+      <ol>
+        <li>Choose card mode (<strong>Cloze</strong> recommended), cloze aggressiveness, and tags.</li>
+        <li>Click <em>Copy Prompt</em> and paste it into ChatGPT with your source content (slides/paragraphs, etc.).</li>
+        <li>Copy the JSON output from ChatGPT (whole code block is fine).</li>
+        <li>Paste it below or upload the file. Preview cards, then export as <strong>TSV</strong> for Anki.</li>
+        <li>In Anki, import the TSV and select the <strong>Cloze</strong> (or <strong>Basic</strong>) note type.</li>
+      </ol>
+      <p class="helper tiny">Tip: For medical content, prefer Cloze + Moderate/Smart aggressiveness to keep deletions targeted.</p>
     </div>
+
+    <!-- Config -->
+    <div class="section">
+      <h2>Step 1: Configure</h2>
+      <div style="display:grid; gap:18px; grid-template-columns: 1fr 1fr; max-width:860px;">
+        <div>
+          <label for="mode">Card Mode</label>
+          <select id="mode">
+            <option value="cloze" selected>Cloze (recommended)</option>
+            <option value="basic">Basic (Front/Back)</option>
+          </select>
+          <p class="helper">Cloze text like: <span class="cloze-chip">{{c1::Bohr effect}}</span></p>
+        </div>
+        <div id="clozeAggWrap">
+          <label for="clozeAgg">Cloze Aggressiveness</label>
+          <select id="clozeAgg">
+            <option value="low">Low (few deletions)</option>
+            <option value="moderate" selected>Moderate (smart)</option>
+            <option value="high">High (many deletions)</option>
+          </select>
+          <p class="helper">Controls how dense the clozes should be.</p>
+        </div>
+        <div>
+          <label for="tagInput">Tags (optional, space or comma separated)</label>
+          <input type="text" id="tagInput" placeholder="e.g. cardio heme respiratory"/>
+          <p class="helper">Applied to every card in the export.</p>
+        </div>
+        <div>
+          <label for="cardLimit">Max Cards</label>
+          <select id="cardLimit">
+            <option>10</option>
+            <option selected>20</option>
+            <option>30</option>
+            <option>40</option>
+            <option>50</option>
+          </select>
+          <p class="helper">Ask ChatGPT not to exceed this amount.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prompt -->
+    <div class="section">
+      <h2>Step 2: Copy ChatGPT Prompt</h2>
+      <div class="button-group">
+        <button id="copyPromptBtn">📋 Copy Prompt to Clipboard</button>
+      </div>
+      <pre id="promptText" class="prompt" spellcheck="false"></pre>
+      <p class="tagline tiny">Paste this prompt into ChatGPT, then paste the JSON it returns in Step 3.</p>
+    </div>
+
+    <!-- Input -->
+    <div class="error-message" id="errorMessage"></div>
+    <div class="section" id="inputSection">
+      <h2>Step 3: Paste JSON or Upload File</h2>
+      <textarea id="jsonInput" placeholder='Paste the JSON here (the tool will strip ``` fences automatically)'></textarea>
+      <div class="button-group" style="margin-top:10px;">
+        <button id="loadBtn">Load Cards</button>
+        <label for="uploadFile" class="file-upload-label">Upload JSON</label>
+        <input type="file" id="uploadFile" accept=".json,.txt"/>
+        <button id="clearBtn">Clear</button>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div id="preview" class="preview">
+      <div class="section">
+        <h2>Preview</h2>
+        <div id="previewList"></div>
+      </div>
+
+      <div class="section">
+        <h2>Export</h2>
+        <div class="button-group">
+          <button id="exportTSVBtn">⬇️ Download Anki TSV</button>
+          <button id="downloadJsonBtn">⬇️ Download JSON</button>
+          <button id="resetBtn">Start Over</button>
+        </div>
+        <p class="helper tiny" style="margin-top:10px;">
+          <strong>In Anki:</strong> File → Import → choose the TSV → set <em>Note Type</em> to <strong>Cloze</strong> (for cloze cards) or <strong>Basic</strong> (for basic cards). For Cloze, map the first field to “Text” and second to “Extra”; Tags import automatically.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- State ----------
+    let cards = []; // normalized internal representation
+    let mode = "cloze";
+
+    // ---------- Helpers ----------
+    function qs(id){ return document.getElementById(id); }
+    function showError(msg){
+      const el = qs('errorMessage');
+      el.textContent = msg; el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+    function getGlobalTags(){
+      const raw = qs('tagInput').value.trim();
+      if(!raw) return [];
+      return raw.split(/[,\\s]+/).filter(Boolean);
+    }
+    function sanitizeFences(txt){
+      return txt.replace(/```json\\s*/gi,'').replace(/```\\s*/g,'').trim();
+    }
+    function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+    function asArray(x){ return Array.isArray(x)?x:(x? [x] : []); }
+
+    // ---------- Prompt Builder ----------
+    function buildPrompt(){
+      mode = qs('mode').value;
+      const limit = qs('cardLimit').value;
+      const agg = qs('clozeAgg').value;
+      const sharedTags = getGlobalTags().join(' ');
+
+      const aggressivenessText = {
+        low: "Use few cloze deletions—only the highest-yield terms (eponyms, definitions, key steps, formula pivots).",
+        moderate: "Use smart, concise clozes on high-yield concepts, names, numbers, and cause→effect pivots. Avoid over-clozing.",
+        high: "Use many cloze deletions but still avoid fragmenting sentences; prioritize density while keeping each card answerable."
+      }[agg];
+
+      const baseRules = `
+General rules:
+- Output strictly as a JSON array ONLY inside a \\\`\\\`\\\`json code block.
+- Do not exceed ${limit} cards.
+- Use concise, self-contained phrasing. Avoid duplicating the same fact.
+- Prefer high-yield material; skip trivia.
+- Provide helpful "extra" notes only if valuable (concise).
+- Keep unicode symbols and subscripts as-is.
+
+`;
+
+      let schemaText = '';
+      if(mode === 'cloze'){
+        schemaText = `
+Cloze card schema (array of objects):
+[
+  {
+    "text": "Full sentence(s) with {{c1::target}} cloze(s). Multiple deletions allowed (c1, c2...).",
+    "extra": "Optional extra context / mnemonic",
+    "tags": ["optional","topic","subtopic"]
+  }
+]
+
+Cloze quality guidance:
+- ${aggressivenessText}
+- Prefer whole-term clozes (not partial letters).
+- Don't cloze the same fact more than once.
+- If a sentence needs multiple clozes, number them c1, c2, c3... in reading order.
+- Avoid creating more than ~3 clozes per sentence unless truly necessary.
+`;
+      } else {
+        schemaText = `
+Basic card schema (array of objects):
+[
+  {
+    "front": "Question or prompt",
+    "back": "Clear, precise answer",
+    "extra": "Optional extra context / mnemonic",
+    "tags": ["optional","topic","subtopic"]
+  }
+]
+
+Basic quality guidance:
+- Make the front specific; the back should be the unique best answer.
+- Avoid multi-part answers; split into separate cards if needed.
+`;
+      }
+
+      const tagNote = sharedTags ? `\nFinal note: Please include these global tags on each card in the "tags" array as well: ${sharedTags}\n` : '';
+
+      const prompt = `You are generating high-yield ${mode === 'cloze' ? 'Cloze' : 'Basic'} Anki flashcards from the content I provide.
+
+${baseRules}${schemaText}
+
+Now read the content below and produce the JSON as specified. Respond ONLY with the JSON array inside a \\\`\\\`\\\`json code block.
+
+[PASTE YOUR CONTENT BELOW THIS LINE]
+`;
+      qs('promptText').textContent = prompt;
+    }
+
+    // ---------- UI Wiring ----------
+    function toggleDarkMode(){
+      document.body.classList.toggle('dark-mode');
+      const icon = qs('darkIcon');
+      if(document.body.classList.contains('dark-mode')){
+        localStorage.setItem('darkMode','enabled'); icon.textContent = '☀️';
+      } else {
+        localStorage.setItem('darkMode','disabled'); icon.textContent = '🌙';
+      }
+    }
+
+    function refreshAggVisibility(){
+      qs('clozeAggWrap').style.display = (qs('mode').value === 'cloze') ? 'block' : 'none';
+    }
+
+    function copyPrompt(button){
+      const text = qs('promptText').textContent;
+      navigator.clipboard.writeText(text).then(()=>{
+        const old = button.textContent, oldBg = button.style.background;
+        button.textContent = '✓ Copied!'; button.style.background = '#22c55e';
+        setTimeout(()=>{ button.textContent = old; button.style.background = oldBg; }, 1600);
+      }).catch(err=> alert('Copy failed: '+err));
+    }
+
+    // ---------- Parsing & Normalization ----------
+    function normalizeInput(json){
+      // Accepts either Cloze schema or Basic schema as defined in the prompt.
+      const sharedTags = getGlobalTags();
+      const out = [];
+      json.forEach((item, idx)=>{
+        if(qs('mode').value === 'cloze'){
+          if(!item.text) throw new Error(`Item ${idx+1}: missing "text"`);
+          const extra = item.extra || "";
+          const tags = [...new Set([...(item.tags||[]), ...sharedTags])];
+          out.push({ type: 'cloze', text: String(item.text), extra: String(extra), tags });
+        } else {
+          if(!item.front || !item.back) throw new Error(`Item ${idx+1}: missing "front" or "back"`);
+          const extra = item.extra || "";
+          const tags = [...new Set([...(item.tags||[]), ...sharedTags])];
+          out.push({ type: 'basic', front: String(item.front), back: String(item.back), extra: String(extra), tags });
+        }
+      });
+      return out;
+    }
+
+    function parseAndLoad(){
+      let raw = qs('jsonInput').value.trim();
+      if(!raw){ showError('Please paste or upload JSON first.'); return; }
+
+      raw = sanitizeFences(raw);
+      let parsed;
+      try{
+        parsed = JSON.parse(raw);
+      } catch(e){
+        showError('Invalid JSON: '+e.message);
+        return;
+      }
+      if(!Array.isArray(parsed) || parsed.length===0){
+        showError('JSON must be a non-empty array.'); return;
+      }
+      try{
+        cards = normalizeInput(parsed);
+      } catch(e){
+        showError(e.message); return;
+      }
+      renderPreview();
+      qs('preview').classList.add('show');
+      document.getElementById('preview').scrollIntoView({behavior:'smooth'});
+    }
+
+    // ---------- Preview Rendering ----------
+    function renderPreview(){
+      const list = qs('previewList');
+      list.innerHTML = '';
+      cards.forEach((c, i)=>{
+        const div = document.createElement('div');
+        div.className = 'card';
+
+        if(c.type === 'cloze'){
+          const html = renderClozeHTML(c.text);
+          div.innerHTML = `
+            <h4>Card ${i+1} <span class="pill">Cloze</span> ${c.tags.map(t=>`<span class="pill">${t}</span>`).join('')}</h4>
+            <div class="text">${html}</div>
+            ${c.extra ? `<div class="helper"><strong>Extra:</strong> ${escapeHTML(c.extra)}</div>` : ''}
+          `;
+          // hook up reveal buttons
+          setTimeout(()=> div.querySelectorAll('.reveal').forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+              const target = btn.previousElementSibling;
+              if(target.dataset.answerShown === '1'){
+                target.textContent = target.dataset.mask; target.dataset.answerShown = '0';
+                btn.textContent = 'Reveal';
+              } else {
+                target.textContent = target.dataset.answer; target.dataset.answerShown = '1';
+                btn.textContent = 'Hide';
+              }
+            });
+          }),0);
+        } else {
+          div.innerHTML = `
+            <h4>Card ${i+1} <span class="pill">Basic</span> ${c.tags.map(t=>`<span class="pill">${t}</span>`).join('')}</h4>
+            <div class="text"><strong>Front:</strong> ${escapeHTML(c.front)}</div>
+            <div class="text"><strong>Back:</strong> ${escapeHTML(c.back)}</div>
+            ${c.extra ? `<div class="helper"><strong>Extra:</strong> ${escapeHTML(c.extra)}</div>` : ''}
+          `;
+        }
+        list.appendChild(div);
+      });
+    }
+
+    function escapeHTML(s){
+      return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+              .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+
+    function renderClozeHTML(text){
+      // Show masked clozes with a toggle
+      // Matches {{cN::answer}} or {{cN::answer::hint}}
+      const regex = /\\{\\{c(\\d+)::(.*?)(?:::.*?|)\\}\\}/g;
+      let idx = 0;
+      return escapeHTML(text).replace(regex, (m, n, ans)=>{
+        const mask = '▮▮▮';
+        const id = 'cz_'+(idx++);
+        // The content is escaped, so store answers in data-* and render spans we can toggle.
+        return `<span class="cloze-chip" data-id="${id}" data-answer="${escapeHTML(ans)}" data-mask="${mask}" data-answer-shown="0">${mask}</span><button class="reveal tiny">Reveal</button>`;
+      });
+    }
+
+    // ---------- Exporters ----------
+    // TSV format: fields separated by tab, rows by newline.
+    // For Cloze: Field1=Text (with {{c::}}), Field2=Extra, Tags=space-separated
+    // For Basic: Field1=Front, Field2=Back, Field3=Extra, Tags=space-separated
+    function exportTSV(){
+      if(cards.length === 0){ showError('No cards to export.'); return; }
+      let tsv = '';
+      const tagJoin = (tags) => (tags||[]).join(' ');
+      if(cards[0].type === 'cloze'){
+        tsv = cards.map(c => [
+          c.text, (c.extra||''), tagJoin(c.tags)
+        ].join('\\t')).join('\\n');
+        downloadFile(tsv, 'anki-cloze', 'txt');
+      } else {
+        tsv = cards.map(c => [
+          c.front, c.back, (c.extra||''), tagJoin(c.tags)
+        ].join('\\t')).join('\\n');
+        downloadFile(tsv, 'anki-basic', 'txt');
+      }
+    }
+
+    function downloadJSON(){
+      if(cards.length===0){ showError('Nothing to download.'); return; }
+      const pretty = JSON.stringify(cards, null, 2);
+      downloadFile(pretty, 'flashcards', 'json', 'application/json');
+    }
+
+    function downloadFile(content, base, ext, mime){
+      const date = new Date().toISOString().slice(0,10);
+      const blob = new Blob([content], { type: mime || 'text/tab-separated-values;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `${base}-${date}.${ext}`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ---------- File Upload ----------
+    function handleFileUpload(e){
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        qs('jsonInput').value = ev.target.result;
+        parseAndLoad();
+      };
+      reader.onerror = (ev)=> showError('Error reading file.');
+      reader.readAsText(file);
+    }
+
+    // ---------- Reset/Clear ----------
+    function resetAll(){
+      cards = [];
+      qs('jsonInput').value = '';
+      qs('uploadFile').value = '';
+      qs('preview').classList.remove('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function clearInput(){
+      qs('jsonInput').value = '';
+      qs('uploadFile').value = '';
+    }
+
+    // ---------- Init ----------
+    window.addEventListener('DOMContentLoaded', ()=>{
+      if(localStorage.getItem('darkMode')==='enabled'){
+        document.body.classList.add('dark-mode'); qs('darkIcon').textContent='☀️';
+      }
+      qs('darkToggle').addEventListener('click', toggleDarkMode);
+
+      ['mode','clozeAgg','cardLimit','tagInput'].forEach(id => qs(id).addEventListener('change', ()=>{
+        refreshAggVisibility(); buildPrompt();
+      }));
+      refreshAggVisibility(); buildPrompt();
+
+      qs('copyPromptBtn').addEventListener('click', function(){ copyPrompt(this); });
+      qs('loadBtn').addEventListener('click', parseAndLoad);
+      qs('clearBtn').addEventListener('click', clearInput);
+      qs('resetBtn').addEventListener('click', resetAll);
+      qs('exportTSVBtn').addEventListener('click', exportTSV);
+      qs('downloadJsonBtn').addEventListener('click', downloadJSON);
+      qs('uploadFile').addEventListener('change', handleFileUpload);
+    });
+  </script>
 </body>
 </html>
