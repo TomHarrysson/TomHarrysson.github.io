@@ -1,441 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCQ Quiz Tool | Tom Harrysson</title>
-    <style>
-        :root {
-            --bg-gradient-start: #e2e8f0;
-            --bg-gradient-mid: #cbd5e1;
-            --bg-gradient-end: #94a3b8;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --header-content-text: #1e293b;
-            --section-bg: #f8fafc;
-            --border-color: #e2e8f0;
-            --accent-primary: #0891b2;
-            --correct: #15803d;
-            --incorrect: #dc2626;
-            --info-box-text: #78350f;
-            --info-box-h3: #92400e;
-            --unanswered-color: #f59e0b;
-        }
-
-        body.dark-mode {
-            --bg-gradient-start: #0f172a;
-            --bg-gradient-mid: #1e293b;
-            --bg-gradient-end: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #e2e8f0;
-            --card-bg: rgba(51, 65, 85, 0.95);
-            --header-content-text: #f8fafc;
-            --section-bg: #475569;
-            --border-color: #64748b;
-            --accent-primary: #06b6d4;
-            --correct: #22c55e;
-            --incorrect: #ef4444;
-            --info-box-text: #fde68a;
-            --info-box-h3: #fde68a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--accent-primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        h1 {
-            color: var(--header-content-text);
-            font-size: 2rem;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .subtitle {
-            color: var(--text-primary);
-            opacity: 0.8;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .dark-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .section {
-            margin-bottom: 30px;
-            padding: 25px;
-            background: var(--section-bg);
-            border-radius: 12px;
-        }
-
-        .section h2 {
-            color: var(--header-content-text);
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--accent-primary);
-            padding-bottom: 10px;
-        }
-
-        .info-box {
-            background: #fef3c7;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #f59e0b;
-        }
-
-        body.dark-mode .info-box {
-            background: #78350f;
-            border-left-color: #fbbf24;
-        }
-
-        .info-box h3 {
-            color: var(--info-box-h3);
-            margin-bottom: 10px;
-        }
-        
-        .info-box ol {
-            color: var(--info-box-text);
-            line-height: 1.8;
-            margin-left: 20px;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            background: var(--card-bg);
-            color: var(--text-primary);
-            font-family: 'Courier New', monospace;
-            min-height: 200px;
-            resize: vertical;
-        }
-
-        button, .file-upload-label {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--accent-primary), #06b6d4);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            margin-right: 10px;
-            display: inline-block; /* For label */
-        }
-
-        button:hover:not(:disabled), .file-upload-label:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        #uploadFile {
-            display: none; /* Hide the actual file input */
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        body.dark-mode .error-message {
-            background: #7f1d1d;
-            color: #fca5a5;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        .mcq-container {
-            display: none;
-        }
-
-        .mcq-container.show {
-            display: block;
-        }
-
-        .mcq-question {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border-left: 4px solid var(--accent-primary);
-        }
-
-        .question-number {
-            color: var(--accent-primary);
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
-
-        .question-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--header-content-text);
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .option {
-            padding: 15px;
-            background: var(--section-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .option:hover:not(.disabled) {
-            background: var(--accent-primary);
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .option.selected {
-            border-color: var(--accent-primary);
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .option.correct {
-            border-color: var(--correct);
-            background: var(--correct);
-            color: white;
-        }
-
-        .option.incorrect {
-            border-color: var(--incorrect);
-            background: var(--incorrect);
-            color: white;
-        }
-
-        .option.disabled {
-            cursor: not-allowed;
-        }
-
-        .explanation {
-            background: #fef3c7;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #f59e0b;
-            display: none;
-        }
-
-        body.dark-mode .explanation {
-            background: #78350f;
-            border-left-color: #fbbf24;
-        }
-
-        .explanation.show {
-            display: block;
-        }
-
-        .explanation-label {
-            font-weight: 700;
-            color: var(--info-box-h3);
-            margin-bottom: 5px;
-        }
-
-        .explanation-text {
-            color: var(--info-box-text);
-            line-height: 1.6;
-        }
-
-        .explanation-text strong {
-            display: block;
-            margin-top: 10px;
-        }
-
-        .explanation-text strong:first-child {
-            margin-top: 0;
-        }
-
-        .feedback-correct { color: var(--correct); }
-        .feedback-incorrect { color: var(--incorrect); }
-        .feedback-unanswered { color: var(--unanswered-color); }
-        .feedback-unanswered-text { color: var(--text-primary); }
-
-        .score-card {
-            background: var(--section-bg);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .score-card.show {
-            display: block;
-        }
-
-        .score-number {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-            margin: 10px 0;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MCQ Quiz Tool | Tom Harrysson</title>
+  <style>
+    :root{
+      --bg-gradient-start:#e2e8f0;--bg-gradient-mid:#cbd5e1;--bg-gradient-end:#94a3b8;
+      --text-primary:#1e293b;--text-secondary:#475569;--card-bg:rgba(255,255,255,.95);
+      --header-content-text:#1e293b;--section-bg:#f8fafc;--border-color:#e2e8f0;
+      --accent-primary:#0891b2;--correct:#15803d;--incorrect:#dc2626;
+      --info-box-text:#78350f;--info-box-h3:#92400e;--unanswered-color:#f59e0b
+    }
+    body.dark-mode{
+      --bg-gradient-start:#0f172a;--bg-gradient-mid:#1e293b;--bg-gradient-end:#334155;
+      --text-primary:#f8fafc;--text-secondary:#e2e8f0;--card-bg:rgba(51,65,85,.95);
+      --header-content-text:#f8fafc;--section-bg:#475569;--border-color:#64748b;
+      --accent-primary:#06b6d4;--correct:#22c55e;--incorrect:#ef4444;
+      --info-box-text:#fde68a;--info-box-h3:#fde68a
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Georgia',serif;
+      background:linear-gradient(135deg,var(--bg-gradient-start) 0%,var(--bg-gradient-mid) 50%,var(--bg-gradient-end) 100%);
+      min-height:100vh;padding:20px;color:var(--text-primary);transition:.3s ease all
+    }
+    .container{
+      max-width:1000px;margin:0 auto;background:var(--card-bg);padding:40px;border-radius:20px;
+      box-shadow:0 20px 40px rgba(0,0,0,.1);position:relative
+    }
+    .back-link{display:inline-block;margin-bottom:20px;color:var(--accent-primary);text-decoration:none;font-weight:600}
+    .back-link:hover{text-decoration:underline}
+    h1{color:var(--header-content-text);font-size:2rem;margin-bottom:10px;text-align:center}
+    .subtitle{color:var(--text-primary);opacity:.8;text-align:center;margin-bottom:30px}
+    .dark-toggle{
+      position:absolute;top:20px;right:20px;background:var(--card-bg);
+      border:2px solid var(--border-color);border-radius:50%;width:44px;height:44px;
+      cursor:pointer;font-size:1.2rem;display:grid;place-items:center
+    }
+    .section{margin-bottom:30px;padding:25px;background:var(--section-bg);border-radius:12px}
+    .section h2{
+      color:var(--header-content-text);font-size:1.5rem;margin-bottom:20px;border-bottom:2px solid var(--accent-primary);padding-bottom:10px
+    }
+    .info-box{background:#fef3c7;padding:20px;border-radius:8px;margin-bottom:20px;border-left:4px solid #f59e0b}
+    body.dark-mode .info-box{background:#78350f;border-left-color:#fbbf24}
+    .info-box h3{color:var(--info-box-h3);margin-bottom:10px}
+    .info-box ol{color:var(--info-box-text);line-height:1.8;margin-left:20px}
+    textarea{
+      width:100%;padding:15px;border:2px solid var(--border-color);border-radius:8px;
+      font-size:1rem;background:var(--card-bg);color:var(--text-primary);
+      font-family:'Courier New',monospace;min-height:200px;resize:vertical
+    }
+    button,.file-upload-label{
+      padding:12px 24px;background:linear-gradient(135deg,var(--accent-primary),#06b6d4);
+      color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:.3s ease all;font-size:1rem;margin-right:10px;display:inline-block
+    }
+    button:hover:not(:disabled),.file-upload-label:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    button:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+    #uploadFile{display:none}
+    .error-message{background:#fee2e2;color:#991b1b;padding:15px;border-radius:8px;margin-bottom:20px;display:none}
+    body.dark-mode .error-message{background:#7f1d1d;color:#fca5a5}
+    .error-message.show{display:block}
+    .control-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+    .control-row label{font-weight:600;color:var(--text-primary);margin-right:6px}
+    .control-row select{
+      width:220px;padding:10px;border:2px solid var(--border-color);border-radius:8px;
+      font-size:1rem;background:var(--card-bg);color:var(--text-primary)
+    }
+    .badge{
+      display:inline-block;margin-top:10px;padding:8px 12px;border-radius:999px;
+      background:#ecfeff;color:#155e75;border:1px solid #06b6d4;font-size:.9rem
+    }
+    body.dark-mode .badge{background:#0f766e;color:#ecfeff;border-color:#67e8f9}
+    .mcq-container{display:none}.mcq-container.show{display:block}
+    .mcq-question{background:var(--card-bg);padding:25px;border-radius:12px;margin-bottom:25px;border-left:4px solid var(--accent-primary)}
+    .question-number{color:var(--accent-primary);font-weight:700;font-size:1.1rem;margin-bottom:15px}
+    .question-text{font-size:1.1rem;font-weight:600;color:var(--header-content-text);margin-bottom:20px;line-height:1.6}
+    .options{display:flex;flex-direction:column;gap:10px;margin-bottom:15px}
+    .option{padding:15px;background:var(--section-bg);border:2px solid var(--border-color);border-radius:8px;cursor:pointer;transition:.3s ease all}
+    .option:hover:not(.disabled){background:var(--accent-primary);color:#fff;transform:translateX(5px)}
+    .option.selected{border-color:var(--accent-primary);background:var(--accent-primary);color:#fff}
+    .option.correct{border-color:var(--correct);background:var(--correct);color:#fff}
+    .option.incorrect{border-color:var(--incorrect);background:var(--incorrect);color:#fff}
+    .option.disabled{cursor:not-allowed}
+    .explanation{background:#fef3c7;padding:15px;border-radius:8px;margin-top:15px;border-left:4px solid #f59e0b;display:none}
+    body.dark-mode .explanation{background:#78350f;border-left-color:#fbbf24}
+    .explanation.show{display:block}
+    .explanation-label{font-weight:700;color:var(--info-box-h3);margin-bottom:5px}
+    .explanation-text{color:var(--info-box-text);line-height:1.6}
+    .explanation-text strong{display:block;margin-top:10px}
+    .explanation-text strong:first-child{margin-top:0}
+    .feedback-correct{color:var(--correct)}.feedback-incorrect{color:var(--incorrect)}
+    .feedback-unanswered{color:var(--unanswered-color)}.feedback-unanswered-text{color:var(--text-primary)}
+    .score-card{background:var(--section-bg);padding:20px;border-radius:12px;text-align:center;margin-bottom:20px;display:none}
+    .score-card.show{display:block}
+    .score-number{font-size:3rem;font-weight:700;color:var(--accent-primary);margin:10px 0}
+    .button-group{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+    @media (max-width:768px){.container{padding:20px}.control-row select{width:100%}}
+  </style>
 </head>
 <body>
-    <button id="darkToggle" class="dark-toggle">
-        <span id="darkIcon">🌙</span>
-    </button>
+  <button id="darkToggle" class="dark-toggle" aria-label="Toggle dark mode"><span id="darkIcon">🌙</span></button>
 
-    <div class="container">
-        <a href="tools.html" class="back-link">← Back to Tools</a>
-        
-        <h1>🎯 MCQ Quiz Tool</h1>
-        <p class="subtitle">Paste JSON from ChatGPT and take your quiz!</p>
+  <div class="container">
+    <a href="tools.html" class="back-link">← Back to Tools</a>
 
-        <div class="info-box">
-            <h3>📋 How to Use:</h3>
-            <ol>
-                <li>Copy the prompt below and paste it into ChatGPT.</li>
-                <li>Add your study material to ChatGPT.</li>
-                <li>Copy the JSON output from ChatGPT.</li>
-                <li>Paste it in the text box below **OR** upload the file if you saved one.</li>
-                <li>Click "Load Quiz" and start!</li>
-            </ol>
-        </div>
+    <h1>🎯 MCQ Quiz Tool</h1>
+    <p class="subtitle">Paste JSON from ChatGPT and take your quiz!</p>
 
-        <div class="section">
-            <h2>Step 1: Choose Number of Questions</h2>
-            <div style="margin-bottom: 20px;">
-                <label for="numQuestions" style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-primary);">How many questions do you want?</label>
-                <select id="numQuestions" style="width: 200px; padding: 10px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; background: var(--card-bg); color: var(--text-primary);">
-                    <option value="5">5 Questions</option>
-                    <option value="10" selected>10 Questions</option>
-                    <option value="15">15 Questions</option>
-                    <option value="20">20 Questions</option>
-                </select>
-            </div>
-        </div>
+    <div class="info-box">
+      <h3>📋 How to Use:</h3>
+      <ol>
+        <li>Choose the number of questions and difficulty.</li>
+        <li>Copy the prompt below and paste it into ChatGPT with your material.</li>
+        <li>Copy the JSON output from ChatGPT.</li>
+        <li>Paste it below <strong>or</strong> upload the file.</li>
+        <li>Click “Load Quiz”.</li>
+      </ol>
+    </div>
 
-        <div class="section">
-            <h2>Step 2: Copy ChatGPT Prompt</h2>
-            <p style="margin-bottom: 15px; color: var(--text-secondary);">Copy this prompt and paste it into ChatGPT with your study material:</p>
-            <button id="copyPromptBtn" style="margin-bottom: 10px; width: 100%;">
-                📋 Copy Prompt to Clipboard
-            </button>
-            <div style="position: relative;">
-                <pre id="promptText" style="background: var(--section-bg); padding: 15px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap;">Create <span id="promptNum">10</span> multiple choice questions based on the following medical material. Format your response as a JSON array INSIDE A CODE BLOCK for easy copying.
+    <div class="section">
+      <h2>Step 1: Choose Number of Questions & Difficulty</h2>
+      <div class="control-row">
+        <label for="numQuestions">Questions</label>
+        <select id="numQuestions">
+          <option value="5">5 Questions</option>
+          <option value="10" selected>10 Questions</option>
+          <option value="15">15 Questions</option>
+          <option value="20">20 Questions</option>
+        </select>
 
-Use this exact format (include the ```json code block):
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty">
+          <option value="EASY">Easy</option>
+          <option value="MODERATE" selected>Moderate</option>
+          <option value="HARD">Hard</option>
+          <option value="MIXED">Mixed</option>
+        </select>
+      </div>
+    </div>
 
-```json
-[
-  {
-    "question": "Your question text here?",
-    "options": ["Option A", "Option B", "Option C", "Option D", "Option E"],
-    "correct": 0,
-    "explanations": [
-      "Explanation for option A",
-      "Explanation for option B",
-      "Explanation for option C",
-      "Explanation for option D",
-      "Explanation for option E"
-    ]
-  }
-]
-Rules:
-
-    Each question must have exactly 5 options (A-E)
-    "correct" is the index (0-4) of the correct option
-    "explanations" array must have 5 explanations, one for each option
-    Each explanation should explain why that option is correct or incorrect
-    Make questions test important concepts
-    IMPORTANT: Put your response in a ```json code block so it's easy to copy
-
-My study material:
-[PASTE YOUR NOTES HERE]</pre>
-</div>
-</div>
+    <div class="section">
+      <h2>Step 2: Copy ChatGPT Prompt</h2>
+      <p style="margin-bottom:15px;color:var(--text-secondary)">Copy this prompt and paste it into ChatGPT with your study material:</p>
+      <button id="copyPromptBtn" style="margin-bottom:10px;width:100%">📋 Copy Prompt to Clipboard</button>
+      <div style="position:relative">
+        <pre id="promptText" style="background:var(--section-bg);padding:15px;border-radius:8px;overflow-x:auto;white-space:pre-wrap;"></pre>
+      </div>
+    </div>
 
     <div class="error-message" id="errorMessage"></div>
 
     <div class="section" id="inputSection">
-        <h2>Step 3: Paste JSON or Upload File</h2>
-        <textarea id="jsonInput" placeholder='Paste the JSON here (you can paste the whole code block from ChatGPT, it will be cleaned automatically):
+      <h2>Step 3: Paste JSON or Upload File</h2>
+      <textarea id="jsonInput" placeholder='Paste the JSON here (you can paste the whole code block from ChatGPT; it will be cleaned automatically):
 
 Example:
 [
@@ -452,311 +170,399 @@ Example:
 ]
 }
 ]'></textarea>
-        <div class="button-group">
-            <button id="loadQuizBtn">Load Quiz</button>
-            <label for="uploadFile" class="file-upload-label">Upload File</label>
-            <input type="file" id="uploadFile" accept=".json, .txt">
-            <button id="clearBtn">Clear</button>
-        </div>
+      <div class="button-group">
+        <button id="loadQuizBtn">Load Quiz</button>
+        <label for="uploadFile" class="file-upload-label">Upload File</label>
+        <input type="file" id="uploadFile" accept=".json, .txt"/>
+        <button id="clearBtn">Clear</button>
+      </div>
+      <div id="distributionBadge" class="badge" style="display:none;"></div>
     </div>
 
     <div class="score-card" id="scoreCard">
-        <h2>Your Score</h2>
-        <div class="score-number" id="scoreNumber">0/0</div>
-        <p id="scoreMessage"></p>
+      <h2>Your Score</h2>
+      <div class="score-number" id="scoreNumber">0/0</div>
+      <p id="scoreMessage"></p>
     </div>
 
     <div class="mcq-container" id="mcqContainer"></div>
 
-    <div class="button-group" id="actionButtons" style="display: none;">
-        <button id="checkAnswersBtn">Check Answers</button>
-        <button id="downloadJsonBtn" disabled>Download JSON</button>
-        <button id="resetQuizBtn">New Quiz</button>
+    <div class="button-group" id="actionButtons" style="display:none">
+      <button id="checkAnswersBtn">Check Answers</button>
+      <button id="downloadJsonBtn" disabled>Download JSON</button>
+      <button id="resetQuizBtn">New Quiz</button>
     </div>
-</div>
+  </div>
 
-<script>
+  <script>
     let mcqData = [];
     let userAnswers = [];
     let answered = false;
 
-    function updatePrompt() {
-        const numQuestions = document.getElementById('numQuestions').value;
-        document.getElementById('promptNum').textContent = numQuestions;
+    // ===== Prompt Builder (plain text only; no HTML inside the prompt) =====
+    function buildPrompt(n, difficulty) {
+      return (
+`Create ${n} multiple-choice questions based on the provided medical material.
+Output must be ONLY a single JSON array inside one \`\`\`json code block — no commentary.
+
+JSON Schema (do not change):
+\`\`\`json
+[
+  {
+    "question": "Your question text here?",
+    "options": ["Option A", "Option B", "Option C", "Option D", "Option E"],
+    "correct": 0,
+    "explanations": [
+      "Explanation for option A",
+      "Explanation for option B",
+      "Explanation for option C",
+      "Explanation for option D",
+      "Explanation for option E"
+    ]
+  }
+]
+\`\`\`
+
+GLOBAL PARAMETERS (edit in place if needed)
+- DIFFICULTY = ${difficulty}  (EASY | MODERATE | HARD | MIXED)
+- CREATIVITY = MEDIUM  (LOW | MEDIUM | HIGH)
+- CLINICAL CONTEXT TARGET = 50%
+- TOPIC FOCUS = none
+
+CONTENT RULES
+1) Anti-guessing design:
+   - Options similar in length, tone, and specificity; consistent units.
+   - No “All/None of the above”.
+   - Distractors are plausible and each is wrong for one precise reason (wrong mechanism, threshold, population, sequence, or conflicts with a key stem finding).
+
+2) Even distribution of correct answers (with randomisation):
+   - Use an evenly distributed multiset of correct indices across A–E.
+     For 10 questions → each index 0–4 appears exactly 2×.
+     For other N → counts per index differ by at most 1.
+   - BEFORE output, shuffle the index list so the order is unpredictable.
+     Valid example for 10: [3,0,4,1,2,1,0,4,2,3]. INVALID: [0,1,2,3,4,0,1,2,3,4].
+   - Do NOT include the list in the output; only apply it.
+
+3) Explanation quality (depth upgrade):
+   - Correct option: 2–3 sentence mechanistic/causal justification linking stem → principle → answer (not a restatement).
+   - Each incorrect option: 1–2 sentence targeted reason it fails (e.g., mismatched pathway, contraindicated here, wrong range/unit, wrong step in guideline algorithm, reversed causality).
+   - British spelling.
+
+4) Difficulty logic:
+   - EASY: one key fact; MODERATE: 1–2 step reasoning; HARD: vignette + integration + exclusion.
+   - MIXED: ≈ one third each (easy / moderate / hard).
+
+5) Vignette construction:
+   - Concise (≤60 words); include just enough info to make the answer deducible, not guessable.
+   - No invented drugs/guidelines beyond the provided notes.
+
+6) Integrity:
+   - No hallucinated facts; restrict to the provided notes. If an exact number is absent, use general phrasing (e.g., “elevated”).
+   - One best answer only; options length-balanced.
+
+SELF-CHECK (internal—do not include in output):
+- Evenly distributed, shuffled correct indices applied.
+- Exactly 5 options and 5 explanations per question.
+- Explanations are causal/specific, not restatements.
+- No “all/none of the above”; options length-balanced.
+- Stems match DIFFICULTY and vignette target.
+- Output is only the JSON code block.
+
+SOURCE MATERIAL:
+[PASTE YOUR NOTES HERE]`
+      );
     }
 
-    function copyPrompt(button) {
-        const promptText = document.getElementById('promptText').textContent;
-        navigator.clipboard.writeText(promptText).then(() => {
-            const originalText = button.textContent;
-            const originalBackground = button.style.background;
-            button.textContent = '✓ Copied!';
-            button.style.background = '#22c55e';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = originalBackground;
-            }, 2000);
-        }).catch(err => {
-            alert('Failed to copy. Please select and copy manually. Error: ' + err);
+    function renderPrompt(){
+      const n = document.getElementById('numQuestions').value;
+      const diff = document.getElementById('difficulty').value;
+      const pre = document.getElementById('promptText');
+      pre.textContent = buildPrompt(n, diff); // plain text, so no <span> ends up in the prompt
+    }
+
+    function copyPrompt(button){
+      const text = document.getElementById('promptText').textContent;
+      navigator.clipboard.writeText(text).then(()=>{
+        const originalText = button.textContent;
+        const originalBg = button.style.background;
+        button.textContent='✓ Copied!';
+        button.style.background='#22c55e';
+        setTimeout(()=>{button.textContent=originalText;button.style.background=originalBg;},2000);
+      }).catch(err=>{
+        alert('Failed to copy. Please select and copy manually. Error: '+err);
+      });
+    }
+
+    // ===== Distribution Enforcer (fix for A/B-only correct answers) =====
+    function generateTargetIndices(n){
+      // base counts
+      const base = Math.floor(n/5);
+      const remainder = n % 5;
+      const counts = [0,1,2,3,4].map(i => base + (i < remainder ? 1 : 0));
+      // build list
+      const list = [];
+      for(let idx=0; idx<5; idx++){
+        for(let c=0; c<counts[idx]; c++) list.push(idx);
+      }
+      // Fisher–Yates shuffle
+      for(let i=list.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [list[i],list[j]] = [list[j],list[i]];
+      }
+      return list;
+    }
+
+    function swap(arr, i, j){
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+
+    function enforceEvenDistribution(data){
+      const n = data.length;
+      const target = generateTargetIndices(n);
+
+      // Apply target index per question by swapping options/explanations so the correct lands on target
+      data.forEach((q, i) => {
+        const desired = target[i];
+        const current = q.correct;
+        if (current === desired) return;
+
+        // swap the current correct option into desired position, and move occupant back to current
+        if (Array.isArray(q.options) && q.options.length === 5) {
+          swap(q.options, current, desired);
+        }
+        if (Array.isArray(q.explanations) && q.explanations.length === 5) {
+          swap(q.explanations, current, desired);
+        }
+        q.correct = desired;
+      });
+      return target; // return for diagnostics
+    }
+
+    function countCorrectIndices(data){
+      const counts = [0,0,0,0,0];
+      data.forEach(q => { if(Number.isInteger(q.correct) && q.correct>=0 && q.correct<5){ counts[q.correct]++; }});
+      return counts;
+    }
+
+    function showDistributionBadge(beforeCounts, afterCounts){
+      const badge = document.getElementById('distributionBadge');
+      const letters = ['A','B','C','D','E'];
+
+      if (!beforeCounts || !afterCounts) { badge.style.display='none'; return; }
+
+      const beforeTxt = letters.map((L,i)=>`${L}:${beforeCounts[i]}`).join(' • ');
+      const afterTxt  = letters.map((L,i)=>`${L}:${afterCounts[i]}`).join(' • ');
+      badge.innerHTML = `✅ Answer distribution normalised (A–E balanced)<br/><small>Before: ${beforeTxt} &nbsp; | &nbsp; After: ${afterTxt}</small>`;
+      badge.style.display='inline-block';
+    }
+
+    // ===== Quiz rendering & UX =====
+    function loadQuiz(){
+      let input = document.getElementById('jsonInput').value.trim();
+      if(!input){ showError('Please paste or upload JSON data first!'); return; }
+      input = input.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+
+      try{
+        mcqData = JSON.parse(input);
+        if(!Array.isArray(mcqData) || mcqData.length===0){
+          throw new Error('JSON must be an array with at least one question');
+        }
+        mcqData.forEach((q,i)=>{
+          if(!q.question || !q.options || !Array.isArray(q.options) ||
+             q.correct===undefined || !q.explanations || !Array.isArray(q.explanations)){
+            throw new Error(`Question ${i+1} is missing required fields`);
+          }
+          if(q.options.length!==5) throw new Error(`Question ${i+1} must have exactly 5 options`);
+          if(q.explanations.length!==5) throw new Error(`Question ${i+1} must have exactly 5 explanations`);
         });
-    }
 
-    function loadQuiz() {
-        let input = document.getElementById('jsonInput').value.trim();
-        
-        if (!input) {
-            showError('Please paste or upload JSON data first!');
-            return;
-        }
+        // Enforce balanced, randomised distribution of correct answers (A–E)
+        const before = countCorrectIndices(mcqData);
+        enforceEvenDistribution(mcqData);
+        const after  = countCorrectIndices(mcqData);
+        showDistributionBadge(before, after);
 
-        input = input.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-
-        try {
-            mcqData = JSON.parse(input);
-            
-            if (!Array.isArray(mcqData) || mcqData.length === 0) {
-                throw new Error('JSON must be an array with at least one question');
-            }
-            
-            mcqData.forEach((q, i) => {
-                if (!q.question || !q.options || !Array.isArray(q.options) || 
-                    q.correct === undefined || !q.explanations || !Array.isArray(q.explanations)) {
-                    throw new Error(`Question ${i + 1} is missing required fields`);
-                }
-                if (q.options.length !== 5) {
-                    throw new Error(`Question ${i + 1} must have exactly 5 options`);
-                }
-                if (q.explanations.length !== 5) {
-                    throw new Error(`Question ${i + 1} must have exactly 5 explanations`);
-                }
-            });
-            
-            userAnswers = new Array(mcqData.length).fill(null);
-            answered = false;
-            
-            document.getElementById('errorMessage').classList.remove('show');
-            document.getElementById('downloadJsonBtn').disabled = false; // Enable download button
-            displayMCQs();
-            
-        } catch (error) {
-            showError('Invalid JSON format: ' + error.message);
-            console.error('Parse error:', error);
-            document.getElementById('downloadJsonBtn').disabled = true;
-        }
-    }
-
-    function displayMCQs() {
-        const container = document.getElementById('mcqContainer');
-        container.innerHTML = '';
-        
-        mcqData.forEach((mcq, index) => {
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'mcq-question';
-            questionDiv.innerHTML = `
-                <div class="question-number">Question ${index + 1}</div>
-                <div class="question-text">${mcq.question}</div>
-                <div class="options" id="options-${index}">
-                    ${mcq.options.map((option, optIndex) => `
-                        <div class="option" onclick="selectOption(${index}, ${optIndex})" id="option-${index}-${optIndex}">
-                            <strong>${String.fromCharCode(65 + optIndex)}.</strong> ${option}
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="explanation" id="explanation-${index}">
-                    <div class="explanation-label">Explanation:</div>
-                    <div class="explanation-text" id="explanation-text-${index}"></div>
-                </div>
-            `;
-            container.appendChild(questionDiv);
-        });
-        
-        container.classList.add('show');
-        document.getElementById('actionButtons').style.display = 'flex';
-        document.getElementById('scoreCard').classList.remove('show');
-        
-        container.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function selectOption(questionIndex, optionIndex) {
-        if (answered) return;
-        
-        for (let i = 0; i < 5; i++) {
-            document.getElementById(`option-${questionIndex}-${i}`).classList.remove('selected');
-        }
-        
-        document.getElementById(`option-${questionIndex}-${optionIndex}`).classList.add('selected');
-        userAnswers[questionIndex] = optionIndex;
-    }
-
-    function checkAnswers() {
-        if (answered) return;
-        
-        let score = 0;
-        
-        mcqData.forEach((mcq, index) => {
-            const userAnswer = userAnswers[index];
-            const correctAnswer = mcq.correct;
-            
-            for (let i = 0; i < 5; i++) {
-                const opt = document.getElementById(`option-${index}-${i}`);
-                opt.classList.add('disabled');
-                opt.classList.remove('selected');
-                
-                if (i === correctAnswer) {
-                    opt.classList.add('correct');
-                } else if (i === userAnswer) {
-                    opt.classList.add('incorrect');
-                }
-            }
-            
-            let explanationHTML = '';
-            
-            if (userAnswer !== null && userAnswer !== correctAnswer) {
-                explanationHTML = `
-                    <div style="margin-bottom: 15px;">
-                        <strong class="feedback-incorrect">Your answer (${String.fromCharCode(65 + userAnswer)}):</strong>
-                        ${mcq.explanations[userAnswer]}
-                    </div>
-                    <div>
-                        <strong class="feedback-correct">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong>
-                        ${mcq.explanations[correctAnswer]}
-                    </div>`;
-            } else if (userAnswer === correctAnswer) {
-                explanationHTML = `
-                    <div>
-                        <strong class="feedback-correct">✓ Correct!</strong>
-                        ${mcq.explanations[correctAnswer]}
-                    </div>`;
-            } else {
-                explanationHTML = `
-                    <div>
-                        <strong class="feedback-unanswered">No answer selected</strong>
-                        <strong class="feedback-unanswered-text">Correct answer (${String.fromCharCode(65 + correctAnswer)}):</strong>
-                        ${mcq.explanations[correctAnswer]}
-                    </div>`;
-            }
-            
-            document.getElementById(`explanation-text-${index}`).innerHTML = explanationHTML;
-            document.getElementById(`explanation-${index}`).classList.add('show');
-            
-            if (userAnswer === correctAnswer) {
-                score++;
-            }
-        });
-        
-        answered = true;
-        
-        const scoreCard = document.getElementById('scoreCard');
-        const scoreNumber = document.getElementById('scoreNumber');
-        const scoreMessage = document.getElementById('scoreMessage');
-        
-        scoreNumber.textContent = `${score}/${mcqData.length}`;
-        
-        const percentage = (score / mcqData.length) * 100;
-        if (percentage >= 90) {
-            scoreMessage.textContent = '🎉 Outstanding! Excellent work!';
-        } else if (percentage >= 70) {
-            scoreMessage.textContent = '👏 Good job! Keep it up!';
-        } else if (percentage >= 50) {
-            scoreMessage.textContent = '📚 Not bad, but review the material again.';
-        } else {
-            scoreMessage.textContent = '💪 Keep studying, you\'ll get there!';
-        }
-        
-        scoreCard.classList.add('show');
-        scoreCard.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function resetQuiz() {
-        document.getElementById('inputSection').scrollIntoView({ behavior: 'smooth' });
-        document.getElementById('mcqContainer').classList.remove('show');
-        document.getElementById('scoreCard').classList.remove('show');
-        document.getElementById('actionButtons').style.display = 'none';
-        document.getElementById('jsonInput').value = '';
-        document.getElementById('uploadFile').value = ''; // Clear file input
-        document.getElementById('downloadJsonBtn').disabled = true; // Disable download button
-        mcqData = [];
-        userAnswers = [];
+        userAnswers = new Array(mcqData.length).fill(null);
         answered = false;
+
+        document.getElementById('errorMessage').classList.remove('show');
+        document.getElementById('downloadJsonBtn').disabled = false;
+        displayMCQs();
+      }catch(error){
+        showError('Invalid JSON format: ' + error.message);
+        console.error('Parse error:', error);
+        document.getElementById('downloadJsonBtn').disabled = true;
+      }
     }
 
-    function clearInput() {
-        document.getElementById('jsonInput').value = '';
-        document.getElementById('uploadFile').value = '';
+    function displayMCQs(){
+      const container = document.getElementById('mcqContainer');
+      container.innerHTML='';
+      mcqData.forEach((mcq,index)=>{
+        const qDiv = document.createElement('div');
+        qDiv.className='mcq-question';
+        qDiv.innerHTML = `
+          <div class="question-number">Question ${index+1}</div>
+          <div class="question-text">${mcq.question}</div>
+          <div class="options" id="options-${index}">
+            ${mcq.options.map((opt,oi)=>`
+              <div class="option" onclick="selectOption(${index},${oi})" id="option-${index}-${oi}">
+                <strong>${String.fromCharCode(65+oi)}.</strong> ${opt}
+              </div>`).join('')}
+          </div>
+          <div class="explanation" id="explanation-${index}">
+            <div class="explanation-label">Explanation:</div>
+            <div class="explanation-text" id="explanation-text-${index}"></div>
+          </div>`;
+        container.appendChild(qDiv);
+      });
+      container.classList.add('show');
+      document.getElementById('actionButtons').style.display='flex';
+      document.getElementById('scoreCard').classList.remove('show');
+      container.scrollIntoView({behavior:'smooth'});
     }
 
-    function showError(message) {
-        const errorDiv = document.getElementById('errorMessage');
-        errorDiv.textContent = message;
-        errorDiv.classList.add('show');
-        setTimeout(() => errorDiv.classList.remove('show'), 5000);
+    function selectOption(qi,oi){
+      if(answered) return;
+      for(let i=0;i<5;i++){
+        document.getElementById(`option-${qi}-${i}`).classList.remove('selected');
+      }
+      document.getElementById(`option-${qi}-${oi}`).classList.add('selected');
+      userAnswers[qi]=oi;
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        const icon = document.getElementById('darkIcon');
-        
-        if (document.body.classList.contains('dark-mode')) {
-            localStorage.setItem('darkMode', 'enabled');
-            icon.textContent = '☀️';
-        } else {
-            localStorage.setItem('darkMode', 'disabled');
-            icon.textContent = '🌙';
+    function checkAnswers(){
+      if(answered) return;
+      let score=0;
+      mcqData.forEach((mcq,idx)=>{
+        const ua = userAnswers[idx];
+        const ca = mcq.correct;
+        for(let i=0;i<5;i++){
+          const opt = document.getElementById(`option-${idx}-${i}`);
+          opt.classList.add('disabled');
+          opt.classList.remove('selected');
+          if(i===ca) opt.classList.add('correct');
+          else if(i===ua) opt.classList.add('incorrect');
         }
-    }
-
-    function downloadJson() {
-        if (mcqData.length === 0) return;
-
-        const jsonString = JSON.stringify(mcqData, null, 2);
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        const date = new Date().toISOString().slice(0, 10);
-        a.href = url;
-        a.download = `quiz-${date}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-    
-    function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const text = e.target.result;
-            document.getElementById('jsonInput').value = text;
-            loadQuiz();
-        };
-        reader.onerror = function(e) {
-            showError("Error reading file.");
-            console.error("File reading error", e);
-        };
-        reader.readAsText(file);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('darkIcon').textContent = '☀️';
+        let html='';
+        if(ua!==null && ua!==ca){
+          html = `
+            <div style="margin-bottom:15px;">
+              <strong class="feedback-incorrect">Your answer (${String.fromCharCode(65+ua)}):</strong>
+              ${mcq.explanations[ua]}
+            </div>
+            <div>
+              <strong class="feedback-correct">Correct answer (${String.fromCharCode(65+ca)}):</strong>
+              ${mcq.explanations[ca]}
+            </div>`;
+        }else if(ua===ca){
+          html = `
+            <div>
+              <strong class="feedback-correct">✓ Correct!</strong>
+              ${mcq.explanations[ca]}
+            </div>`;
+        }else{
+          html = `
+            <div>
+              <strong class="feedback-unanswered">No answer selected</strong>
+              <strong class="feedback-unanswered-text">Correct answer (${String.fromCharCode(65+ca)}):</strong>
+              ${mcq.explanations[ca]}
+            </div>`;
         }
+        document.getElementById(`explanation-text-${idx}`).innerHTML=html;
+        document.getElementById(`explanation-${idx}`).classList.add('show');
+        if(ua===ca) score++;
+      });
+      answered=true;
 
-        // Add Event Listeners
-        document.getElementById('darkToggle').addEventListener('click', toggleDarkMode);
-        document.getElementById('numQuestions').addEventListener('change', updatePrompt);
-        document.getElementById('copyPromptBtn').addEventListener('click', function() { copyPrompt(this); });
-        document.getElementById('loadQuizBtn').addEventListener('click', loadQuiz);
-        document.getElementById('clearBtn').addEventListener('click', clearInput);
-        document.getElementById('checkAnswersBtn').addEventListener('click', checkAnswers);
-        document.getElementById('resetQuizBtn').addEventListener('click', resetQuiz);
-        document.getElementById('downloadJsonBtn').addEventListener('click', downloadJson);
-        document.getElementById('uploadFile').addEventListener('change', handleFileUpload);
+      const scoreCard=document.getElementById('scoreCard');
+      const scoreNumber=document.getElementById('scoreNumber');
+      const scoreMessage=document.getElementById('scoreMessage');
+      scoreNumber.textContent=`${score}/${mcqData.length}`;
+      const pct=(score/mcqData.length)*100;
+      if(pct>=90) scoreMessage.textContent='🎉 Outstanding! Excellent work!';
+      else if(pct>=70) scoreMessage.textContent='👏 Good job! Keep it up!';
+      else if(pct>=50) scoreMessage.textContent='📚 Not bad, but review the material again.';
+      else scoreMessage.textContent='💪 Keep studying, you\'ll get there!';
+      scoreCard.classList.add('show');
+      scoreCard.scrollIntoView({behavior:'smooth'});
+    }
+
+    function resetQuiz(){
+      document.getElementById('inputSection').scrollIntoView({behavior:'smooth'});
+      document.getElementById('mcqContainer').classList.remove('show');
+      document.getElementById('scoreCard').classList.remove('show');
+      document.getElementById('actionButtons').style.display='none';
+      document.getElementById('jsonInput').value='';
+      document.getElementById('uploadFile').value='';
+      document.getElementById('downloadJsonBtn').disabled=true;
+      mcqData=[];userAnswers=[];answered=false;
+      document.getElementById('distributionBadge').style.display='none';
+    }
+
+    function clearInput(){
+      document.getElementById('jsonInput').value='';
+      document.getElementById('uploadFile').value='';
+    }
+
+    function showError(msg){
+      const el=document.getElementById('errorMessage');
+      el.textContent=msg;el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'),5000);
+    }
+
+    function toggleDarkMode(){
+      document.body.classList.toggle('dark-mode');
+      const icon=document.getElementById('darkIcon');
+      if(document.body.classList.contains('dark-mode')){
+        localStorage.setItem('darkMode','enabled');icon.textContent='☀️';
+      }else{
+        localStorage.setItem('darkMode','disabled');icon.textContent='🌙';
+      }
+    }
+
+    function downloadJson(){
+      if(mcqData.length===0) return;
+      const jsonString=JSON.stringify(mcqData,null,2);
+      const blob=new Blob([jsonString],{type:"application/json"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      const date=new Date().toISOString().slice(0,10);
+      a.href=url;a.download=`quiz-${date}.json`;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function handleFileUpload(e){
+      const file=e.target.files[0]; if(!file) return;
+      const reader=new FileReader();
+      reader.onload=function(ev){
+        const text=ev.target.result;
+        document.getElementById('jsonInput').value=text;
+        loadQuiz();
+      };
+      reader.onerror=function(ev){showError("Error reading file.");console.error("File reading error",ev);};
+      reader.readAsText(file);
+    }
+
+    // ===== Init =====
+    window.addEventListener('DOMContentLoaded',()=>{
+      if(localStorage.getItem('darkMode')==='enabled'){
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkIcon').textContent='☀️';
+      }
+      document.getElementById('darkToggle').addEventListener('click',toggleDarkMode);
+      document.getElementById('numQuestions').addEventListener('change',renderPrompt);
+      document.getElementById('difficulty').addEventListener('change',renderPrompt);
+      document.getElementById('copyPromptBtn').addEventListener('click',function(){copyPrompt(this);});
+      document.getElementById('loadQuizBtn').addEventListener('click',loadQuiz);
+      document.getElementById('clearBtn').addEventListener('click',clearInput);
+      document.getElementById('checkAnswersBtn').addEventListener('click',checkAnswers);
+      document.getElementById('resetQuizBtn').addEventListener('click',resetQuiz);
+      document.getElementById('downloadJsonBtn').addEventListener('click',downloadJson);
+      document.getElementById('uploadFile').addEventListener('change',handleFileUpload);
+      renderPrompt(); // initial prompt text
     });
-</script>
-
+  </script>
 </body>
 </html>
