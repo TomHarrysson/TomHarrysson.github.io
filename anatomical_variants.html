@@ -1,403 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Cardiovascular Anatomical Variants | Tom Harrysson</title>
-    <meta name="description" content="Concise, system-based reference of clinically relevant cardiovascular anatomical variants (coronary arteries, aortic arch, PFO, and more)." />
-    <meta name="author" content="Tom Harrysson" />
 
-    <style>
-        :root{
-            --bg-1: #f1f5f9;
-            --bg-2: #e2e8f0;
-            --card-bg: rgba(255,255,255,0.98);
-            --muted: #64748b;
-            --text: #0f172a;
-            --accent: #0891b2;
-            --table-border: #e6eef3;
-            --shadow: rgba(2,6,23,0.08);
-        }
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JCGH0E144N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JCGH0E144N');
+</script>
 
-        body.dark-mode{
-            --bg-1: #0f172a;
-            --bg-2: #111827;
-            --card-bg: rgba(15,23,42,0.96);
-            --muted: #cbd5e1;
-            --text: #f8fafc;
-            --accent: #06b6d4;
-            --table-border: #1f2937;
-            --shadow: rgba(0,0,0,0.45);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anatomical Variants — Coming Soon | Tom Harrysson</title>
 
-        *{box-sizing:border-box}
-        body{
-            margin:0;
-            font-family: Georgia, serif;
-            color:var(--text);
-            background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
-            -webkit-font-smoothing:antialiased;
-            -moz-osx-font-smoothing:grayscale;
-            line-height:1.6;
-            padding:30px 20px;
-            transition:background .25s ease,color .25s ease;
-        }
+<meta name="description" content="Concise, system-based reference of clinically relevant anatomical variants — coming soon.">
+<meta name="author" content="Tom Harrysson">
+<meta name="robots" content="index, follow">
 
-        .container{
-            max-width:1100px;
-            margin:0 auto;
-        }
+<meta property="og:type" content="website">
+<meta property="og:title" content="Anatomical Variants — Coming Soon">
+<meta property="og:description" content="Clinically relevant anatomical variants reference is on the way.">
+<meta property="og:site_name" content="Tom Harrysson">
 
-        .card{
-            background:var(--card-bg);
-            border-radius:16px;
-            padding:28px;
-            box-shadow: 0 12px 30px var(--shadow);
-            overflow:hidden;
-        }
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Anatomical Variants — Coming Soon">
+<meta name="twitter:description" content="Clinically relevant anatomical variants reference is on the way.">
 
-        .topbar{
-            display:flex;
-            align-items:center;
-            gap:16px;
-            margin-bottom:18px;
-        }
+<style>
+  :root {
+      /* Light mode colors - Subtle medical theme with soft teals */
+      --bg-gradient-start: #e2e8f0;
+      --bg-gradient-mid: #cbd5e1;
+      --bg-gradient-end: #94a3b8;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --header-overlay: rgba(30, 41, 59, 0.85);
+      --header-content-bg: rgba(255, 255, 255, 0.98);
+      --header-content-text: #1e293b;
+      --section-bg: #f8fafc;
+      --border-color: #e2e8f0;
+      --accent-primary: #0891b2;
+      --accent-secondary: #06b6d4;
+      --work-accent: #0e7490;
+      --work-bg: #f0f9ff;
+      --link-color: #0891b2;
+  }
 
-        .page-title{
-            margin:6px 0 16px 0;
-            font-size:28px;
-            font-weight:600;
-        }
+  body.dark-mode {
+      /* Dark mode colors - High contrast deep ocean theme */
+      --bg-gradient-start: #0f172a;
+      --bg-gradient-mid: #1e293b;
+      --bg-gradient-end: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #e2e8f0;
+      --text-muted: #cbd5e1;
+      --card-bg: rgba(51, 65, 85, 0.95);
+      --header-overlay: rgba(15, 23, 42, 0.95);
+      --header-content-bg: rgba(51, 65, 85, 0.98);
+      --header-content-text: #f8fafc;
+      --section-bg: #475569;
+      --border-color: #64748b;
+      --accent-primary: #06b6d4;
+      --accent-secondary: #22d3ee;
+      --work-accent: #0ea5e9;
+      --work-bg: #334155;
+      --link-color: #22d3ee;
+  }
 
-        .lead{
-            color:var(--muted);
-            margin-bottom:22px;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .btn {
-            background:var(--card-bg);
-            border:1px solid var(--table-border);
-            padding:8px 12px;
-            border-radius:10px;
-            font-weight:600;
-            cursor:pointer;
-            text-decoration: none;
-            color: var(--text);
-            display: inline-block;
-        }
-        .btn:active{transform:translateY(1px)}
+  body {
+      font-family: 'Georgia', serif;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+  }
 
-        /* sections */
-        section.system {
-            /* border-top:1px solid var(--table-border); */ /* Removed as requested */
-            padding-top:22px;
-            margin-top:18px;
-        }
+  .container { width: 100%; max-width: 900px; }
 
-        section.system h2 {
-            display:flex;
-            align-items:center;
-            /* gap:12px; */ /* Removed as emoji is gone */
-            font-size:20px;
-            margin:0 0 12px 0;
-        }
+  .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: background 0.3s ease;
+      position: relative;
+  }
 
-        details { margin-bottom:14px; }
-        summary{
-            cursor:pointer;
-            font-weight:600;
-            padding:10px 12px;
-            border-radius:10px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.01), transparent);
-            list-style:none;
-        }
+  .inner {
+      padding: 48px 36px 40px;
+      text-align: center;
+  }
 
-        /* tables */
-        .variants-table{
-            width:100%;
-            border-collapse:collapse;
-            margin-top:12px;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-        }
-        .variants-table thead th{
-            text-align:left;
-            padding:10px 12px;
-            font-weight:700;
-            border-bottom:2px solid var(--table-border);
-            background:transparent;
-        }
-        .variants-table tbody td{
-            padding:10px 12px;
-            border-bottom:1px solid var(--table-border);
-            vertical-align:top;
-            color:var(--text);
-        }
-        .variants-table tbody tr:last-child td{ border-bottom: none; }
+  /* Dark mode toggle button */
+  .dark-mode-toggle {
+      position: absolute; top: 20px; right: 20px; background: var(--card-bg);
+      border: 2px solid var(--border-color); border-radius: 50%; width: 50px; height: 50px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; transition: all 0.3s ease; z-index: 100;
+  }
+  .dark-mode-toggle:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
 
-        .muted { color:var(--muted); font-size:0.95rem; }
+  .tagline {
+      display: inline-block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--text-secondary);
+      background: var(--section-bg);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+  }
 
-        /* responsive */
-        @media (max-width:800px){
-            .page-title { font-size:22px; }
-            .variants-table thead { display:none; }
-            .variants-table, .variants-table tbody, .variants-table tr, .variants-table td { display:block; width:100%; }
-            .variants-table tr { margin-bottom:12px; border-radius:10px; background:transparent; border:1px solid var(--table-border); padding:8px; }
-            .variants-table td { padding:8px; border:0; }
-            .label { font-weight:700; display:block; margin-bottom:6px; }
-        }
-    </style>
+  h1 {
+      font-size: 2.2rem;
+      color: var(--header-content-text);
+      margin-bottom: 12px;
+      font-weight: 300;
+  }
+
+  p.lead {
+      font-size: 1.08rem;
+      color: var(--text-secondary);
+      margin: 0 auto 20px;
+      max-width: 60ch;
+  }
+
+  .muted { color: var(--text-muted); }
+
+  .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 22px;
+  }
+
+  .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+      border: 1px solid var(--border-color);
+      background: var(--section-bg);
+      color: var(--header-content-text);
+  }
+  .btn:active { transform: translateY(1px); }
+
+  .btn-primary {
+      border: none;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      box-shadow: 0 6px 16px rgba(8, 145, 178, 0.35);
+  }
+
+  .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.92rem;
+  }
+
+  .dot {
+      display:inline-block; width:10px; height:10px; border-radius:50%;
+      background: var(--accent-primary); margin-left: 6px; position: relative; top: -1px;
+      animation: pulse 1.6s infinite ease-in-out;
+  }
+  @keyframes pulse {
+      0% { transform: scale(1); opacity: .9; }
+      50% { transform: scale(1.25); opacity: .6; }
+      100% { transform: scale(1); opacity: .9; }
+  }
+
+  .foot {
+      margin-top: 28px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+  }
+
+  @media (max-width: 640px) {
+      .inner { padding: 42px 22px 34px; }
+      h1 { font-size: 1.9rem; }
+      p.lead { font-size: 1.02rem; }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="card" role="main" aria-labelledby="pagetitle">
-            
-            <div class="topbar">
-                <a class="btn" href="tools.html" title="Back to Extras">← Back</a>
-            </div>
+  <div class="container">
+    <div class="card" role="main" aria-labelledby="title">
+      <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+        <span id="darkModeIcon" aria-hidden="true">🌙</span>
+      </button>
 
-            <h1 id="pagetitle" class="page-title">Clinically Significant Anatomical Variants</h1>
-            <p class="lead">A concise, system-based overview of important anatomical variants with clinical and surgical relevance. <span class="muted">Source: Bergman’s Encyclopedia of Human Anatomic Variation, Radiopaedia, and major anatomy texts.</span></p>
+      <div class="inner">
+        <span class="tagline">Reference Module <span class="dot" aria-hidden="true"></span></span>
+        <h1 id="title">Anatomical Variants — Coming Soon</h1>
+        <p class="lead">
+          A concise, clinically focused catalogue of anatomical variants (with prevalence, imaging notes, and surgical implications) is being curated.
+          <br><span class="muted">Thanks for your patience while this section is prepared.</span>
+        </p>
 
-
-            <section id="cardiovascular" class="system" aria-labelledby="cardiovascular-title">
-                <h2 id="cardiovascular-title">CARDIOVASCULAR SYSTEM</h2>
-
-                <details open>
-                    <summary>Cardiac Structural Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Cardiac variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Patent Foramen Ovale (PFO)</td>
-                                <td class="muted">~25%</td>
-                                <td>Allows potential for paradoxical embolism (→ stroke); associated with migraine and decompression sickness.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-                <details>
-                    <summary>Coronary Artery Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Coronary variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Left-dominant coronary circulation</td>
-                                <td class="muted">~10%</td>
-                                <td>Alters infarct territory and surgical bypass strategy. (Right-dominant is ~80-85%).</td>
-                            </tr>
-                            <tr>
-                                <td>Anomalous coronary origin (e.g., RCA from left sinus)</td>
-                                <td class="muted">&lt;1%</td>
-                                <td>May have malignant interarterial courses → sudden cardiac death risk; important for surgical correction.</td>
-                            </tr>
-                            <tr>
-                                <td>Separate LAD and LCx origins from left sinus</td>
-                                <td class="muted">~1–2%</td>
-                                <td>Can complicate catheterization and graft planning.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-                <details>
-                    <summary>Aortic Arch & Great Vessel Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Aortic arch variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>“Bovine” arch (common origin of brachiocephalic & left common carotid)</td>
-                                <td class="muted">~15–25%</td>
-                                <td>Common variant; relevant in carotid stenting and thoracic surgery access planning.</td>
-                            </tr>
-                            <tr>
-                                <td>Aberrant right subclavian artery (arteria lusoria)</td>
-                                <td class="muted">~0.5–2%</td>
-                                <td>May cause dysphagia lusoria; important to know for mediastinal surgery and central line routes.</td>
-                            </tr>
-                            <tr>
-                                <td>Right aortic arch / double aortic arch</td>
-                                <td class="muted">Rare</td>
-                                <td>Can compress trachea or esophagus (vascular ring); often congenital associations.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-                <details>
-                    <summary>Cerebral & Head/Neck Vascular Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Cerebral and Neck variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Incomplete Circle of Willis (e.g., PCoA hypoplasia)</td>
-                                <td class="muted">~25–50%</td>
-                                <td>Reduces collateral flow; influences stroke patterns and aneurysm risk.</td>
-                            </tr>
-                            <tr>
-                                <td>Fetal-type posterior cerebral artery (fetal PCA)</td>
-                                <td class="muted">~10–30%</td>
-                                <td>PCA originates from ICA; alters perfusion territories; important for endovascular procedures.</td>
-                            </tr>
-                            <tr>
-                                <td>Aberrant internal carotid artery in middle ear</td>
-                                <td class="muted">Rare</td>
-                                <td>Pulsatile middle ear mass; major risk if unrecognized during ENT surgery.</td>
-                            </tr>
-                            <tr>
-                                <td>Persistent trigeminal / hypoglossal artery</td>
-                                <td class="muted">&lt;1%</td>
-                                <td>Embryologic carotid–basilar anastomoses that complicate angiography.</td>
-                            </tr>
-                            <tr>
-                                <td>Hypoplastic transverse/sigmoid sinus</td>
-                                <td class="muted">~20%</td>
-                                <td>Can mimic venous occlusion (thrombosis) on imaging; clinical correlation required.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-                <details>
-                    <summary>Thoracic Venous Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Thoracic vein variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                             <tr>
-                                <td>Common ostium of left pulmonary veins</td>
-                                <td class="muted">~20%</td>
-                                <td>Key in atrial fibrillation ablation mapping and catheter approach.</td>
-                            </tr>
-                            <tr>
-                                <td>Supernumerary right middle pulmonary vein</td>
-                                <td class="muted">~25–30%</td>
-                                <td>May require identification during pulmonary vein isolation/ablation.</td>
-                            </tr>
-                            <tr>
-                                <td>Azygos continuation of IVC</td>
-                                <td class="muted">~0.5%</td>
-                                <td>Incidental on CT; changes venous return mapping and alters IVC filter considerations.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-                <details>
-                    <summary>Abdominal Arterial Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Abdominal arterial variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Replaced right hepatic artery from SMA (Michels Type III)</td>
-                                <td class="muted">~15%</td>
-                                <td>Crucial for hepatic resection, donor hepatectomy, and cholecystectomy approach.</td>
-                            </tr>
-                            <tr>
-                                <td>Replaced left hepatic artery from left gastric (Michels Type II)</td>
-                                <td class="muted">~10%</td>
-                                <td>Important for gastric and hepatic surgery; at risk in gastrectomy.</td>
-                            </tr>
-                             <tr>
-                                <td>Accessory renal arteries</td>
-                                <td class="muted">~25–30%</td>
-                                <td>Important in nephrectomy, transplant planning, and renal angiography.</td>
-                            </tr>
-                            <tr>
-                                <td>Celiacomesenteric trunk</td>
-                                <td class="muted">~1%</td>
-                                <td>Rare variant; important for upper abdominal vascular surgery and endovascular planning.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-                <details>
-                    <summary>Abdominal Venous Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Abdominal venous variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Retroaortic left renal vein</td>
-                                <td class="muted">2–4%</td>
-                                <td>Can alter approach in aortic and renal surgery; risk during AAA repair.</td>
-                            </tr>
-                            <tr>
-                                <td>Circumaortic left renal vein</td>
-                                <td class="muted">~8%</td>
-                                <td>May complicate adrenal or renal operations; watch for unexpected venous channels.</td>
-                            </tr>
-                            <tr>
-                                <td>Portal vein trifurcation</td>
-                                <td class="muted">~10–20%</td>
-                                <td>Affects segmental hepatic resection and transplant planning.</td>
-                            </tr>
-                             <tr>
-                                <td>Duplicated gonadal (testicular/ovarian) veins</td>
-                                <td class="muted">&lt;5%</td>
-                                <td>May influence varicocele pathology and embolization procedures.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-                <details>
-                    <summary>Limb Vascular Variants</summary>
-                    <table class="variants-table" role="table" aria-label="Limb variants">
-                        <thead>
-                            <tr><th>Variant</th><th>Prevalence</th><th>Clinical significance</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>High bifurcation of brachial artery</td>
-                                <td class="muted">10–20%</td>
-                                <td>Risk during venipuncture and invasive access; alters pulse examination anatomy.</td>
-                            </tr>
-                            <tr>
-                                <td>Superficial ulnar artery</td>
-                                <td class="muted">~5%</td>
-                                <td>May be injured during venepuncture; mistaken for a vein.</td>
-                            </tr>
-                            <tr>
-                                <td>Persistent sciatic artery</td>
-                                <td class="muted">&lt;0.05%</td>
-                                <td>Can form aneurysms; important in peripheral angiography and bypass planning.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </details>
-
-            </section>
-
-            <section style="margin-top:22px;">
-                <h3 style="margin:0 0 8px 0;">References & notes</h3>
-                <p class="muted" style="margin:0 0 12px 0;">
-                    Prevalence estimates are approximate and vary by population and imaging modality. Use imaging or intraoperative assessment to confirm anatomy prior to intervention.
-                </p>
-                <ul style="margin:0 0 18px 20px;color:var(--muted)">
-                    <li>Bergman, R. A., Afifi, A. K., & Miyauchi, R. — <em>Illustrated Encyclopedia of Human Anatomic Variation</em></li>
-                    <li>Radiopaedia — Anatomic variants and case examples</li>
-                    <li>Gray’s Anatomy (relevant chapters)</li>
-                </ul>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <a class="btn" href="extra.html">← Back to Extras</a>
-                </div>
-            </section>
+        <div class="actions">
+          <a class="btn" href="tools.html" title="Back to Tools">← Back to Tools</a>
+          <a class="btn" href="index.html" title="Home">Home</a>
         </div>
-    </div>
 
-    </body>
+        <div class="foot mono">
+          v0.1 • Last updated <span id="updatedDate">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function setIcon() {
+    const icon = document.getElementById('darkModeIcon');
+    if (!icon) return;
+    icon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const enabled = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
+    setIcon();
+  }
+
+  // Initialise theme + icon on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const pref = localStorage.getItem('darkMode');
+    if (pref === 'enabled') document.body.classList.add('dark-mode');
+    setIcon();
+
+    // Simple updated date stamp (client-side)
+    const el = document.getElementById('updatedDate');
+    if (el) {
+      const d = new Date();
+      el.textContent = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+  });
+</script>
+</body>
 </html>
