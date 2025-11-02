@@ -2,108 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Classic Pong | Tom Harrysson</title>
   <style>
     :root{
-      --bg-gradient-start:#e2e8f0;
-      --bg-gradient-mid:#cbd5e1;
-      --bg-gradient-end:#94a3b8;
-      --text-primary:#1e293b;
-      --card-bg:rgba(255,255,255,0.95);
-      --header-content-text:#1e293b;
-      --accent-primary:#0ea5b1; /* teal outline */
-      --canvas-bg:#e5e7eb;
-      --toggle-ring: var(--accent-primary);
+      --bg-gradient-start:#e2e8f0; --bg-gradient-mid:#cbd5e1; --bg-gradient-end:#94a3b8;
+      --text-primary:#1e293b; --card-bg:rgba(255,255,255,0.95); --header-content-text:#1e293b;
+      --accent-primary:#0ea5b1; --canvas-bg:#e5e7eb; --toggle-ring:var(--accent-primary);
     }
     body.dark-mode{
-      --bg-gradient-start:#0f172a;
-      --bg-gradient-mid:#1e293b;
-      --bg-gradient-end:#334155;
-      --text-primary:#f8fafc;
-      --card-bg:rgba(51,65,85,0.95);
-      --header-content-text:#f8fafc;
-      --accent-primary:#06b6d4;
-      --canvas-bg:#0b1220;
-      --toggle-ring: rgba(148,163,184,0.9); /* slate ring in dark */
+      --bg-gradient-start:#0f172a; --bg-gradient-mid:#1e293b; --bg-gradient-end:#334155;
+      --text-primary:#f8fafc; --card-bg:rgba(51,65,85,0.95); --header-content-text:#f8fafc;
+      --accent-primary:#06b6d4; --canvas-bg:#0b1220; --toggle-ring:rgba(148,163,184,0.9);
     }
-
     *{margin:0;padding:0;box-sizing:border-box}
     body{
       font-family: Georgia, serif;
       background:linear-gradient(135deg,var(--bg-gradient-start) 0%,var(--bg-gradient-mid) 50%,var(--bg-gradient-end) 100%);
       min-height:100vh; display:flex; justify-content:center; align-items:center;
-      padding:20px; color:var(--text-primary);
+      padding:16px; color:var(--text-primary);
       transition: background-color .25s ease, color .25s ease;
     }
     .container{
-      background:var(--card-bg); padding:40px; border-radius:20px;
-      box-shadow:0 20px 40px rgba(0,0,0,.1); text-align:center; max-width:920px; width:100%;
+      background:var(--card-bg); padding:24px; border-radius:20px;
+      box-shadow:0 20px 40px rgba(0,0,0,.1); text-align:center; width:100%; max-width:920px;
     }
-    .back-link{
-      display:inline-block; margin-bottom:20px; color:var(--accent-primary);
-      text-decoration:none; font-weight:600;
-    }
+    .back-link{display:inline-block;margin-bottom:16px;color:var(--accent-primary);text-decoration:none;font-weight:600}
     .back-link:hover{text-decoration:underline}
-    h1{color:var(--header-content-text); font-size:2rem; margin-bottom:10px}
-    .subtitle{color:var(--text-primary); opacity:.8; margin-bottom:20px}
-
+    h1{color:var(--header-content-text);font-size:1.8rem;margin-bottom:8px}
+    .subtitle{opacity:.8;margin-bottom:12px}
+    .hud{display:flex;justify-content:center;gap:16px;align-items:center;flex-wrap:wrap}
+    .score{font-size:1.25rem;font-weight:bold;color:var(--header-content-text)}
+    .tip{font-size:.95rem;opacity:.7}
+    .btn{
+      padding:12px 20px; background:linear-gradient(135deg,var(--accent-primary),#06b6d4);
+      color:#fff;border:none;border-radius:12px;font-weight:600;cursor:pointer;
+      margin:10px 6px;transition:transform .2s ease, box-shadow .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .btn:active{transform:translateY(0)}
+    .canvas-wrap{position:relative;margin:14px auto 6px; width:100%}
     canvas{
-      border:3px solid var(--accent-primary); border-radius:10px;
-      display:block; margin:20px auto; background:var(--canvas-bg);
+      width:100%; height:auto; display:block; border:3px solid var(--accent-primary);
+      border-radius:12px; background:var(--canvas-bg); touch-action:none;
     }
-
-    .score{font-size:1.5rem; font-weight:bold; margin:20px 0; color:var(--header-content-text)}
-    .controls{margin:20px 0; color:var(--text-primary); line-height:1.8}
-    button{
-      padding:12px 24px; background:linear-gradient(135deg,var(--accent-primary), #06b6d4);
-      color:#fff; border:none; border-radius:10px; font-weight:600; cursor:pointer;
-      margin:10px 5px; transition: transform .2s ease, box-shadow .2s ease;
+    .overlay-msg{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      pointer-events:none; color:#fff; font-weight:700; text-shadow:0 2px 10px rgba(0,0,0,.6);
+      opacity:.85; font-size:clamp(14px,3.5vw,20px);
     }
-    button:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .game-over{font-size:1.1rem;color:var(--accent-primary);font-weight:700;margin-top:8px;display:none}
+    .game-over.show{display:block}
 
-    /* === THEME TOGGLE (matches your screenshots) === */
+    /* theme toggle */
     .theme-toggle{
-      position:fixed; top:16px; right:16px;
-      width:56px; height:56px; border-radius:50%;
+      position:fixed; top:16px; right:16px; width:56px; height:56px; border-radius:50%;
       background:transparent; border:3px solid var(--toggle-ring);
-      display:grid; place-items:center; cursor:pointer; z-index:1000;
-      padding:0; line-height:0;
+      display:grid; place-items:center; cursor:pointer; z-index:1000; padding:0; line-height:0;
     }
-    .theme-toggle:focus-visible{outline:3px solid var(--accent-primary); outline-offset:3px}
-
-    .theme-toggle svg{
-      position:absolute; width:28px; height:28px; display:block;
-      transition: opacity .18s ease, transform .18s ease;
-    }
+    .theme-toggle svg{position:absolute;width:28px;height:28px;transition:opacity .18s ease, transform .18s ease}
     .icon-sun{opacity:0; transform:scale(.9)}
     .icon-moon{opacity:1; transform:scale(1)}
     body.dark-mode .icon-sun{opacity:1; transform:scale(1)}
     body.dark-mode .icon-moon{opacity:0; transform:scale(.9)}
 
-    .game-over{font-size:1.3rem; color:var(--accent-primary); font-weight:bold; margin:20px 0; display:none}
-    .game-over.show{display:block}
+    @media (max-width: 520px){
+      .container{padding:18px}
+      h1{font-size:1.5rem}
+      .btn{padding:12px 16px}
+    }
   </style>
 </head>
 <body>
-  <!-- Circle-outline toggle; centered sun/moon; no overlay -->
+  <!-- Theme toggle -->
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-    <!-- Moon -->
-    <svg class="icon-moon" viewBox="0 0 24 24" fill="#fbbf24" aria-hidden="true">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"/>
-    </svg>
-    <!-- Sun -->
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="#fbbf24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"/></svg>
     <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="5" fill="#f59e0b"/>
       <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
-        <line x1="12" y1="2" x2="12" y2="5"/>
-        <line x1="12" y1="19" x2="12" y2="22"/>
-        <line x1="2" y1="12" x2="5" y2="12"/>
-        <line x1="19" y1="12" x2="22" y2="12"/>
-        <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/>
-        <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/>
-        <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/>
-        <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/>
+        <line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/>
+        <line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
+        <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/>
+        <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/><line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/>
       </g>
     </svg>
   </button>
@@ -114,70 +95,99 @@
     <h1>🏓 Classic Pong</h1>
     <p class="subtitle">First to 5 points wins!</p>
 
-    <div class="score">
-      <span>You: <span id="playerScore">0</span></span>
-      <span style="margin: 0 30px;">|</span>
-      <span>AI: <span id="aiScore">0</span></span>
+    <div class="hud">
+      <div class="score">You: <span id="playerScore">0</span></div>
+      <div class="score">AI: <span id="aiScore">0</span></div>
+      <div class="tip">Mobile: tap/drag on the left half to move</div>
     </div>
 
-    <canvas id="pongCanvas" width="800" height="400"></canvas>
+    <div class="canvas-wrap">
+      <canvas id="pongCanvas" width="800" height="400"></canvas>
+      <div id="tapHint" class="overlay-msg">Tap to start • Drag to move</div>
+    </div>
 
     <div class="game-over" id="gameOver"></div>
 
-    <div class="controls">
-      <strong>Controls:</strong> Use ↑ and ↓ arrow keys to move your paddle<br>
-      <em>Tip: The ball speeds up with each hit!</em>
+    <div>
+      <button class="btn" onclick="startGame()">Start Game</button>
+      <button class="btn" onclick="resetGame()">Reset</button>
     </div>
-
-    <button onclick="startGame()">Start Game</button>
-    <button onclick="resetGame()">Reset</button>
   </div>
 
   <script>
     const canvas = document.getElementById('pongCanvas');
     const ctx = canvas.getContext('2d');
+    const tapHint = document.getElementById('tapHint');
 
     let gameRunning = false, animationId;
+    let logicalW = 800, logicalH = 400; // internal game units
 
-    const paddle = { width:10, height:80, x:20, y:canvas.height/2-40, speed:6, dy:0 };
-    const aiPaddle = { width:10, height:80, x:canvas.width-30, y:canvas.height/2-40, speed:4 };
-    const ball = { x:canvas.width/2, y:canvas.height/2, radius:8, speed:4, dx:4, dy:4 };
+    const paddle = { width:10, height:80, x:20, y:logicalH/2-40, speed:6, dy:0 };
+    const aiPaddle = { width:10, height:80, x:logicalW-30, y:logicalH/2-40, speed:4 };
+    const ball = { x:logicalW/2, y:logicalH/2, radius:8, speed:4, dx:4, dy:4 };
 
     let playerScore = 0, aiScore = 0;
     const winningScore = 5;
 
-    function drawRect(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x,y,w,h); }
-    function drawCircle(x,y,r,c){ ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+    /* ---------- Responsive Canvas (HiDPI) ---------- */
+    function resizeCanvas(){
+      // target width: container width (up to 920px minus padding), maintain 2:1 ratio
+      const wrap = canvas.parentElement;
+      const cssWidth = Math.min(wrap.clientWidth, 920);
+      const cssHeight = Math.round(cssWidth * 0.5);
 
-    function drawNet(){
-      for(let i=0;i<canvas.height;i+=20){ drawRect(canvas.width/2-2, i, 4, 10, '#475569'); }
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(cssWidth * dpr);
+      canvas.height = Math.round(cssHeight * dpr);
+      canvas.style.width = cssWidth + 'px';
+      canvas.style.height = cssHeight + 'px';
+
+      // Scale drawing to logical space (800x400) regardless of pixels
+      ctx.setTransform(1,0,0,1,0,0);        // reset
+      ctx.scale(canvas.width / logicalW, canvas.height / logicalH);
+      draw(); // redraw on resize
     }
 
+    window.addEventListener('resize', resizeCanvas);
+
+    /* ---------- Drawing Helpers ---------- */
+    function drawRect(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x,y,w,h); }
+    function drawCircle(x,y,r,c){ ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+    function drawNet(){ for(let i=0;i<logicalH;i+=20){ drawRect(logicalW/2-2, i, 4, 10, '#475569'); } }
+
+    function draw(){
+      // use theme-var canvas bg
+      const bg = getComputedStyle(document.body).getPropertyValue('--canvas-bg').trim() || '#1e293b';
+      drawRect(0,0,logicalW,logicalH,bg);
+      drawNet();
+      drawRect(paddle.x,paddle.y,paddle.width,paddle.height,'#22d3ee');
+      drawRect(aiPaddle.x,aiPaddle.y,aiPaddle.width,aiPaddle.height,'#f87171');
+      drawCircle(ball.x,ball.y,ball.radius,'#fbbf24');
+    }
+
+    /* ---------- Game Mechanics ---------- */
     function movePaddle(){
       paddle.y += paddle.dy;
       if(paddle.y<0) paddle.y=0;
-      if(paddle.y+paddle.height>canvas.height) paddle.y=canvas.height-paddle.height;
+      if(paddle.y+paddle.height>logicalH) paddle.y=logicalH-paddle.height;
     }
-
     function moveAI(){
       const c = aiPaddle.y + aiPaddle.height/2;
       if(c < ball.y-20) aiPaddle.y += aiPaddle.speed;
       else if(c > ball.y+20) aiPaddle.y -= aiPaddle.speed;
       if(aiPaddle.y<0) aiPaddle.y=0;
-      if(aiPaddle.y+aiPaddle.height>canvas.height) aiPaddle.y=canvas.height-aiPaddle.height;
+      if(aiPaddle.y+aiPaddle.height>logicalH) aiPaddle.y=logicalH-aiPaddle.height;
     }
-
     function collision(b,p){
       return b.x + b.radius > p.x &&
              b.x - b.radius < p.x + p.width &&
              b.y + b.radius > p.y &&
              b.y - b.radius < p.y + p.height;
     }
-
     function moveBall(){
       ball.x += ball.dx; ball.y += ball.dy;
 
-      if(ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) ball.dy *= -1;
+      if(ball.y - ball.radius < 0 || ball.y + ball.radius > logicalH) ball.dy *= -1;
 
       const p = (ball.dx < 0) ? paddle : aiPaddle;
       if(collision(ball,p)){
@@ -191,36 +201,25 @@
       }
 
       if(ball.x - ball.radius < 0){ aiScore++; updateScore(); resetBall(); }
-      else if(ball.x + ball.radius > canvas.width){ playerScore++; updateScore(); resetBall(); }
+      else if(ball.x + ball.radius > logicalW){ playerScore++; updateScore(); resetBall(); }
     }
-
     function resetBall(){
-      ball.x = canvas.width/2; ball.y = canvas.height/2; ball.speed = 4;
+      ball.x = logicalW/2; ball.y = logicalH/2; ball.speed = 4;
       ball.dx = (Math.random()>0.5?1:-1)*4;
       ball.dy = (Math.random()>0.5?1:-1)*4;
     }
-
     function updateScore(){
       document.getElementById('playerScore').textContent = playerScore;
       document.getElementById('aiScore').textContent = aiScore;
       if(playerScore===winningScore || aiScore===winningScore) endGame();
     }
-
     function endGame(){
       gameRunning=false;
-      const el = document.getElementById('gameOver');
-      el.textContent = (playerScore===winningScore) ? '🎉 You Win! Congratulations!' : '😔 AI Wins! Try again!';
-      el.classList.add('show');
+      document.getElementById('gameOver').textContent =
+        (playerScore===winningScore) ? '🎉 You Win! Congratulations!' : '😔 AI Wins! Try again!';
+      document.getElementById('gameOver').classList.add('show');
       cancelAnimationFrame(animationId);
-    }
-
-    function draw(){
-      const bg = getComputedStyle(document.body).getPropertyValue('--canvas-bg').trim();
-      drawRect(0,0,canvas.width,canvas.height,bg);
-      drawNet();
-      drawRect(paddle.x,paddle.y,paddle.width,paddle.height,'#22d3ee');
-      drawRect(aiPaddle.x,aiPaddle.y,aiPaddle.width,aiPaddle.height,'#f87171');
-      drawCircle(ball.x,ball.y,ball.radius,'#fbbf24');
+      tapHint.style.display = 'flex';
     }
 
     function gameLoop(){
@@ -233,6 +232,7 @@
       if(!gameRunning){
         gameRunning = true;
         document.getElementById('gameOver').classList.remove('show');
+        tapHint.style.display = 'none';
         gameLoop();
       }
     }
@@ -240,40 +240,78 @@
     function resetGame(){
       gameRunning=false; cancelAnimationFrame(animationId);
       playerScore=0; aiScore=0; updateScore();
-      paddle.y = canvas.height/2-40; aiPaddle.y = canvas.height/2-40;
-      resetBall(); document.getElementById('gameOver').classList.remove('show'); draw();
+      paddle.y = logicalH/2-40; aiPaddle.y = logicalH/2-40; resetBall();
+      document.getElementById('gameOver').classList.remove('show');
+      tapHint.style.display = 'flex';
+      draw();
     }
 
+    /* ---------- Desktop Keyboard ---------- */
     document.addEventListener('keydown', e=>{
       if(e.key==='ArrowUp') paddle.dy = -paddle.speed;
       else if(e.key==='ArrowDown') paddle.dy = paddle.speed;
+      else if(e.key===' '){ startGame(); }
     });
     document.addEventListener('keyup', e=>{
       if(e.key==='ArrowUp' || e.key==='ArrowDown') paddle.dy = 0;
     });
 
-    // Theme handling
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    /* ---------- Mobile / Touch Controls ---------- */
+    // Drag on LEFT half of the canvas to set paddle center to finger Y.
+    function canvasPointFromTouch(ev){
+      const rect = canvas.getBoundingClientRect();
+      const t = ev.touches ? ev.touches[0] : ev;
+      const x = t.clientX - rect.left;
+      const y = t.clientY - rect.top;
+      // Convert CSS pixels to logical units (because we scale the ctx)
+      const scaleX = logicalW / rect.width;
+      const scaleY = logicalH / rect.height;
+      return { x: x * scaleX, y: y * scaleY };
+    }
 
-    function applyStoredTheme(){
-      const stored = localStorage.getItem('darkMode');
-      if(stored==='enabled' || (stored===null && prefersDark)) {
-        document.body.classList.add('dark-mode');
-      } else {
-        document.body.classList.remove('dark-mode');
+    function handleTouch(ev){
+      ev.preventDefault();
+      const p = canvasPointFromTouch(ev);
+      // Only react if touch is on the left half (player side)
+      if(p.x <= logicalW * 0.5){
+        paddle.y = p.y - paddle.height/2;
+        if(paddle.y<0) paddle.y = 0;
+        if(paddle.y+paddle.height>logicalH) paddle.y = logicalH-paddle.height;
       }
     }
 
+    canvas.addEventListener('touchstart', (ev)=>{ handleTouch(ev); startGame(); }, {passive:false});
+    canvas.addEventListener('touchmove', handleTouch, {passive:false});
+    canvas.addEventListener('mousedown', (ev)=>{ startGame(); handleTouch(ev); });
+    canvas.addEventListener('mousemove', (ev)=>{ if(gameRunning) handleTouch(ev); });
+
+    // Avoid page scroll bounce on iOS while playing
+    document.addEventListener('touchmove', (e)=>{
+      if(gameRunning) e.preventDefault();
+    }, {passive:false});
+
+    /* ---------- Theme handling ---------- */
+    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    function applyStoredTheme(){
+      const stored = localStorage.getItem('darkMode');
+      if(stored==='enabled' || (stored===null && prefersDark)) document.body.classList.add('dark-mode');
+      else document.body.classList.remove('dark-mode');
+    }
     function toggleDarkMode(){
       const isDark = document.body.classList.toggle('dark-mode');
       localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-      draw(); // sync canvas with theme
+      draw();
     }
+    document.getElementById('themeToggle').addEventListener('click', toggleDarkMode);
 
+    /* ---------- Lifecycle ---------- */
     window.addEventListener('DOMContentLoaded', ()=>{
       applyStoredTheme();
+      resizeCanvas();
       draw();
-      document.getElementById('themeToggle').addEventListener('click', toggleDarkMode);
+    });
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.hidden){ gameRunning=false; cancelAnimationFrame(animationId); }
     });
   </script>
 </body>
