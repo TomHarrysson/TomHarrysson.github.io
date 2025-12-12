@@ -150,6 +150,14 @@
             border-bottom: 1px solid var(--advice-box-border);
             padding-bottom: 5px;
         }
+        
+        /* Inline Link Style */
+        .inline-link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .inline-link:hover { text-decoration: underline; }
 
         /* Calculator Styles */
         .calc-grid {
@@ -276,6 +284,18 @@
         }
         .panel ul { padding: 20px; list-style-type: disc; font-size: 0.95rem; color: var(--text-secondary); }
         .panel li { margin-bottom: 12px; }
+
+        /* Credits */
+        .credits {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        .credits a { color: var(--link-color); text-decoration: none; }
+        .credits a:hover { text-decoration: underline; }
 
         /* Dark Mode Toggle */
         .dark-mode-toggle {
@@ -437,7 +457,7 @@
                             <li>Unlike other similar bleeding risk scores, this tool was specifically developed to assess the risk associated with DOAC therapy, rather than with vitamin K antagonists.</li>
                             <li>The risk score was primarily validated for severe bleeding. Clinicians should also consider the risks and quality of life impacts of other bleeding outcomes in their discussions.</li>
                             <li>This tool does not cover all potential risks for bleeding; therefore, it should be used alongside clinical reasoning.</li>
-                            <li>Initially performed better than the HAS-BLED score, though further research is necessary for confirmation.</li>
+                            <li>Initially performed better than the <a href="hasbled.html" class="inline-link">HAS-BLED score</a>, though further research is necessary for confirmation.</li>
                         </ul>
                     </div>
                 </div>
@@ -449,6 +469,13 @@
                         <li style="margin-bottom: 8px;">A high score is not necessarily a contraindication to DOAC therapy; clinical context is key.</li>
                         <li>Where possible, efforts should be made to address modifiable risk factors for bleeding.</li>
                     </ul>
+                </div>
+
+                <div class="credits">
+                    <p>
+                        Clinical logic and text content adapted from <a href="https://www.mdcalc.com/calc/10086/doac-score-atrial-fibrillation-bleeding-risk" target="_blank" rel="noopener">MDCalc</a>.<br>
+                        MDCalc © 2005–2025. Used for educational purposes.
+                    </p>
                 </div>
 
             </div>
