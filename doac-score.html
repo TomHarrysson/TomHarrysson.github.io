@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>DOAC Score Calculator | Tom Harrysson</title>
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <meta name="description" content="DOAC Score Calculator for bleeding risk in patients on Direct-Acting Oral Anticoagulants">
+    <meta name="author" content="Tom Harrysson">
+
+    <style>
+        :root {
+            /* Inherited Theme Variables */
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #cbd5e1;
+            --bg-gradient-end: #94a3b8;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --header-overlay: rgba(30, 41, 59, 0.85);
+            --header-content-bg: rgba(255, 255, 255, 0.98);
+            --header-content-text: #1e293b;
+            --section-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --accent-primary: #0891b2;
+            --accent-secondary: #06b6d4;
+            --link-color: #0891b2;
+            
+            /* Calculator Specifics */
+            --calc-item-bg: #ffffff;
+            --calc-highlight: #ecfeff;
+            --risk-low: #166534;
+            --risk-low-bg: #dcfce7;
+            --risk-mod: #854d0e;
+            --risk-mod-bg: #fef9c3;
+            --risk-high: #991b1b;
+            --risk-high-bg: #fee2e2;
+            --info-box-bg: #eff6ff;
+            --info-box-border: #bfdbfe;
+            --advice-box-bg: #f0fdf4;
+            --advice-box-border: #bbf7d0;
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-mid: #1e293b;
+            --bg-gradient-end: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --card-bg: rgba(51, 65, 85, 0.95);
+            --header-overlay: rgba(15, 23, 42, 0.95);
+            --header-content-bg: rgba(51, 65, 85, 0.98);
+            --header-content-text: #f8fafc;
+            --section-bg: #475569;
+            --border-color: #64748b;
+            --accent-primary: #06b6d4;
+            --accent-secondary: #22d3ee;
+            --link-color: #22d3ee;
+            
+            --calc-item-bg: #334155;
+            --calc-highlight: #1e293b;
+            --risk-low: #86efac;
+            --risk-low-bg: #14532d;
+            --risk-mod: #fde047;
+            --risk-mod-bg: #422006;
+            --risk-high: #fca5a5;
+            --risk-high-bg: #450a0a;
+            --info-box-bg: #1e3a8a;
+            --info-box-border: #1d4ed8;
+            --advice-box-bg: #14532d;
+            --advice-box-border: #15803d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            padding: 40px 20px;
+            background: linear-gradient(var(--header-overlay), var(--header-overlay));
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: sans-serif;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .back-button:hover { opacity: 1; text-decoration: underline; }
+
+        .content { padding: 30px; }
+
+        /* Usage & Advice Boxes */
+        .usage-box {
+            background: var(--info-box-bg);
+            border: 1px solid var(--info-box-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        
+        .advice-box {
+            margin-top: 30px;
+            background: var(--advice-box-bg);
+            border: 1px solid var(--advice-box-border);
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 0.95rem;
+        }
+        .advice-header {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--risk-low);
+            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--advice-box-border);
+            padding-bottom: 5px;
+        }
+
+        /* Calculator Styles */
+        .calc-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .calc-item {
+            background: var(--calc-item-bg);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-label { font-weight: 500; font-size: 1.05rem; color: var(--text-primary); }
+        .calc-sublabel { font-size: 0.85rem; color: var(--text-secondary); display: block; margin-top: 2px; }
+
+        /* Form Inputs */
+        select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--section-bg);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-primary); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--accent-primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Results Box */
+        .result-box {
+            margin-top: 30px;
+            background: var(--section-bg);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+            color: var(--accent-primary);
+        }
+        .risk-text { font-size: 1.1rem; font-weight: 500; margin-bottom: 5px; }
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        /* Pearls Accordion */
+        .accordion-section { margin-top: 25px; }
+        .accordion {
+            background-color: var(--section-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+        .accordion:hover { background-color: var(--border-color); }
+        .accordion:after { content: '\002B'; font-size: 1.5rem; font-weight: bold; }
+        .active:after { content: "\2212"; }
+        .panel {
+            padding: 0 18px;
+            background-color: var(--card-bg);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-radius: 0 0 12px 12px;
+        }
+        .panel ul { padding: 20px; list-style-type: disc; font-size: 0.95rem; color: var(--text-secondary); }
+        .panel li { margin-bottom: 12px; }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <a href="tools.html" class="back-button">← Tools</a>
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                    <span id="darkModeIcon">🌙</span>
+                </button>
+                <h1>DOAC Score</h1>
+                <p style="opacity: 0.9;">Bleeding Risk with Direct Oral Anticoagulants</p>
+            </div>
+
+            <div class="content">
+                
+                <div class="usage-box">
+                    <p>
+                        <strong>When to Use:</strong> Predict bleeding events in patients with atrial fibrillation being considered for therapy with direct-acting oral anticoagulant (DOAC) medications.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    
+                    <div class="calc-item" style="cursor: default;">
+                        <div class="calc-label">Age</div>
+                        <select id="input_age" onchange="calculateScore()">
+                            <option value="0">&lt; 65 years (0)</option>
+                            <option value="2">65 - 69 years (+2)</option>
+                            <option value="3">70 - 74 years (+3)</option>
+                            <option value="4">75 - 79 years (+4)</option>
+                            <option value="5">≥ 80 years (+5)</option>
+                        </select>
+                    </div>
+
+                    <div class="calc-item" style="cursor: default;">
+                        <div>
+                            <div class="calc-label">Kidney Function</div>
+                            <span class="calc-sublabel">CrCl or eGFR (mL/min)</span>
+                        </div>
+                        <select id="input_gfr" onchange="calculateScore()">
+                            <option value="0">&gt; 60 (0)</option>
+                            <option value="1">30 - 60 (+1)</option>
+                            <option value="2">&lt; 30 (+2)</option>
+                        </select>
+                    </div>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">Underweight</div>
+                            <span class="calc-sublabel">BMI &lt; 18.5 kg/m²</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_weight" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div class="calc-label">Stroke / TIA / Embolism History</div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_stroke" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div class="calc-label">Diabetes</div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_diabetes" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div class="calc-label">Hypertension</div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_htn" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <div class="calc-item" style="cursor: default;">
+                        <div>
+                            <div class="calc-label">Antiplatelet Use</div>
+                            <span class="calc-sublabel">Concomitant use</span>
+                        </div>
+                        <select id="input_antiplatelet" onchange="calculateScore()">
+                            <option value="0">None (0)</option>
+                            <option value="2">Aspirin (+2)</option>
+                            <option value="3">Dual Antiplatelet Therapy (+3)</option>
+                        </select>
+                    </div>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">NSAID Use</div>
+                            <span class="calc-sublabel">Non-steroidal anti-inflammatory drugs</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_nsaid" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">Bleeding History</div>
+                            <span class="calc-sublabel">Prior major bleeding event</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_bleed" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">Liver Disease</div>
+                            <span class="calc-sublabel">Cirrhosis or significant hepatic derangement</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_liver" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                </div>
+
+                <div class="result-box" id="resultBox">
+                    <div class="score-display" id="scoreDisplay">0</div>
+                    <div class="risk-text" id="riskText">1-Year Bleeding Risk: ~0.8%</div>
+                    <div class="risk-badge" id="riskBadge">Very Low Risk</div>
+                </div>
+
+                <div class="accordion-section">
+                    <button class="accordion">Pearls & Pitfalls</button>
+                    <div class="panel">
+                        <ul>
+                            <li>Unlike other similar bleeding risk scores, this tool was specifically developed to assess the risk associated with DOAC therapy, rather than with vitamin K antagonists.</li>
+                            <li>The risk score was primarily validated for severe bleeding. Clinicians should also consider the risks and quality of life impacts of other bleeding outcomes in their discussions.</li>
+                            <li>This tool does not cover all potential risks for bleeding; therefore, it should be used alongside clinical reasoning.</li>
+                            <li>Initially performed better than the HAS-BLED score, though further research is necessary for confirmation.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="advice-box">
+                    <div class="advice-header">Advice</div>
+                    <ul style="padding-left: 20px; list-style-type: circle; color: var(--text-primary);">
+                        <li style="margin-bottom: 8px;">The decision to use anticoagulation therapy with a DOAC should consider multiple factors. This tool should not be the sole determinant of treatment planning, but should guide shared decision-making between the patient and clinician.</li>
+                        <li style="margin-bottom: 8px;">A high score is not necessarily a contraindication to DOAC therapy; clinical context is key.</li>
+                        <li>Where possible, efforts should be made to address modifiable risk factors for bleeding.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Accordion Logic
+    var acc = document.getElementsByClassName("accordion");
+    for (var i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    }
+
+    function calculateScore() {
+        let score = 0;
+        
+        // 1. Age
+        score += parseInt(document.getElementById('input_age').value);
+        
+        // 2. Kidney (CrCl)
+        score += parseInt(document.getElementById('input_gfr').value);
+        
+        // 3. Underweight (+1)
+        if (document.getElementById('check_weight').checked) score += 1;
+        
+        // 4. Stroke (+1)
+        if (document.getElementById('check_stroke').checked) score += 1;
+        
+        // 5. Diabetes (+1)
+        if (document.getElementById('check_diabetes').checked) score += 1;
+        
+        // 6. Hypertension (+1)
+        if (document.getElementById('check_htn').checked) score += 1;
+        
+        // 7. Antiplatelet
+        score += parseInt(document.getElementById('input_antiplatelet').value);
+        
+        // 8. NSAID (+1)
+        if (document.getElementById('check_nsaid').checked) score += 1;
+        
+        // 9. Bleeding History (+3) - Note: Weighted heavily
+        if (document.getElementById('check_bleed').checked) score += 3;
+        
+        // 10. Liver Disease (+2)
+        if (document.getElementById('check_liver').checked) score += 2;
+
+        // Cap at 10
+        if (score > 10) score = 10;
+
+        updateUI(score);
+    }
+
+    function updateUI(score) {
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const riskText = document.getElementById('riskText');
+        const riskBadge = document.getElementById('riskBadge');
+        
+        scoreDisplay.textContent = score;
+
+        // Risk Interpretation (Based on Polina et al. / MDCalc data)
+        let riskPercent = "0.8%";
+        let riskLevel = "Very Low";
+        let levelClass = "low"; // used for styling
+
+        if (score >= 10) {
+            riskPercent = "13.9%";
+            riskLevel = "Very High";
+            levelClass = "high";
+        } else if (score >= 8) {
+            riskPercent = "6.9%";
+            riskLevel = "High";
+            levelClass = "high";
+        } else if (score >= 6) {
+            riskPercent = "3.4%";
+            riskLevel = "Moderate";
+            levelClass = "mod";
+        } else if (score >= 4) {
+            riskPercent = "1.6%";
+            riskLevel = "Low";
+            levelClass = "low"; // or a separate color if desired
+        } else {
+            // 0-3
+            riskPercent = "0.8%";
+            riskLevel = "Very Low";
+            levelClass = "low";
+        }
+
+        riskText.textContent = `1-Year Major Bleeding Risk: ~${riskPercent}`;
+        riskBadge.textContent = `${riskLevel} Risk`;
+
+        setResultStyle(levelClass);
+    }
+
+    function setResultStyle(level) {
+        const box = document.getElementById('resultBox');
+        const badge = document.getElementById('riskBadge');
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+        const display = document.getElementById('scoreDisplay');
+
+        if (level === 'low') {
+            box.style.borderColor = style.getPropertyValue('--risk-low');
+            box.style.backgroundColor = style.getPropertyValue('--risk-low-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-low');
+            display.style.color = style.getPropertyValue('--risk-low');
+        } else if (level === 'mod') {
+            box.style.borderColor = style.getPropertyValue('--risk-mod');
+            box.style.backgroundColor = style.getPropertyValue('--risk-mod-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-mod');
+            display.style.color = style.getPropertyValue('--risk-mod');
+        } else {
+            box.style.borderColor = style.getPropertyValue('--risk-high');
+            box.style.backgroundColor = style.getPropertyValue('--risk-high-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-high');
+            display.style.color = style.getPropertyValue('--risk-high');
+        }
+    }
+
+    // Dark Mode Integration
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        document.getElementById('darkModeIcon').textContent = isDark ? '☀️' : '🌙';
+        calculateScore(); 
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const darkMode = localStorage.getItem('darkMode');
+        if (darkMode === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+        }
+        calculateScore(); 
+    });
+
+</script>
+
+</body>
+</html>
