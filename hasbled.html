@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HAS-BLED Calculator | Tom Harrysson</title>
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <meta name="description" content="Interactive HAS-BLED Score for Major Bleeding Risk in Atrial Fibrillation">
+    <meta name="author" content="Tom Harrysson">
+
+    <style>
+        :root {
+            /* Inherited Theme Variables */
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #cbd5e1;
+            --bg-gradient-end: #94a3b8;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --header-overlay: rgba(30, 41, 59, 0.85);
+            --header-content-bg: rgba(255, 255, 255, 0.98);
+            --header-content-text: #1e293b;
+            --section-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --accent-primary: #0891b2;
+            --accent-secondary: #06b6d4;
+            --link-color: #0891b2;
+            
+            /* Calculator Specifics */
+            --calc-item-bg: #ffffff;
+            --calc-highlight: #ecfeff;
+            --risk-low: #166534;
+            --risk-low-bg: #dcfce7;
+            --risk-mod: #854d0e;
+            --risk-mod-bg: #fef9c3;
+            --risk-high: #991b1b;
+            --risk-high-bg: #fee2e2;
+            --info-box-bg: #eff6ff;
+            --info-box-border: #bfdbfe;
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-mid: #1e293b;
+            --bg-gradient-end: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --card-bg: rgba(51, 65, 85, 0.95);
+            --header-overlay: rgba(15, 23, 42, 0.95);
+            --header-content-bg: rgba(51, 65, 85, 0.98);
+            --header-content-text: #f8fafc;
+            --section-bg: #475569;
+            --border-color: #64748b;
+            --accent-primary: #06b6d4;
+            --accent-secondary: #22d3ee;
+            --link-color: #22d3ee;
+            
+            --calc-item-bg: #334155;
+            --calc-highlight: #1e293b;
+            --risk-low: #86efac;
+            --risk-low-bg: #14532d;
+            --risk-mod: #fde047;
+            --risk-mod-bg: #422006;
+            --risk-high: #fca5a5;
+            --risk-high-bg: #450a0a;
+            --info-box-bg: #1e3a8a;
+            --info-box-border: #1d4ed8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            padding: 40px 20px;
+            background: linear-gradient(var(--header-overlay), var(--header-overlay));
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: sans-serif;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .back-button:hover { opacity: 1; text-decoration: underline; }
+
+        .content { padding: 30px; }
+
+        /* Usage Disclaimer Box */
+        .usage-box {
+            background: var(--info-box-bg);
+            border: 1px solid var(--info-box-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        .usage-box strong { color: var(--accent-primary); }
+
+        /* Calculator Styles */
+        .calc-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .calc-item {
+            background: var(--calc-item-bg);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-item:hover {
+            border-color: var(--accent-primary);
+            background: var(--calc-highlight);
+        }
+
+        .calc-label {
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+        .calc-label span {
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-right: 4px;
+        }
+        
+        .calc-sublabel {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-primary); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--accent-primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Results Box */
+        .result-box {
+            margin-top: 30px;
+            background: var(--section-bg);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+            color: var(--accent-primary);
+        }
+        .risk-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Pearls Accordion */
+        .accordion-section { margin-top: 30px; }
+        .accordion {
+            background-color: var(--section-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+        .accordion:hover { background-color: var(--border-color); }
+        .accordion:after {
+            content: '\002B'; /* Plus sign */
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .active:after { content: "\2212"; /* Minus sign */ }
+        
+        .panel {
+            padding: 0 18px;
+            background-color: var(--card-bg);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-radius: 0 0 12px 12px;
+        }
+        .panel ul {
+            padding: 20px;
+            padding-left: 20px;
+            list-style-type: disc;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        .panel li { margin-bottom: 12px; }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <a href="tools.html" class="back-button">← Tools</a>
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                    <span id="darkModeIcon">🌙</span>
+                </button>
+                <h1>HAS-BLED Calculator</h1>
+                <p style="opacity: 0.9;">Major Bleeding Risk in Atrial Fibrillation</p>
+            </div>
+
+            <div class="content">
+                
+                <div class="usage-box">
+                    <p style="margin-bottom: 10px;">
+                        <strong>When to Use:</strong> Developed as a practical risk score to estimate the 1-year risk for major bleeding in patients with atrial fibrillation.
+                    </p>
+                    <p>
+                        <strong>Population:</strong> Ambulatory and hospitalized patients with AF without mitral valve stenosis or valvular surgery.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>H</span>ypertension</div>
+                            <span class="calc-sublabel">Uncontrolled (>160 mmHg systolic)</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_H" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>A</span>bnormal Renal Function</div>
+                            <span class="calc-sublabel">Dialysis, transplant, Cr >2.26 mg/dL or >200 µmol/L</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_A1" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>A</span>bnormal Liver Function</div>
+                            <span class="calc-sublabel">Cirrhosis, Bilirubin >2x normal, AST/ALT/ALP >3x normal</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_A2" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>S</span>troke</div>
+                            <span class="calc-sublabel">Prior history of stroke</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_S" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>B</span>leeding</div>
+                            <span class="calc-sublabel">Prior major bleeding or predisposition (e.g. anemia)</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_B" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>L</span>abile INR</div>
+                            <span class="calc-sublabel">Unstable/high INR or time in therapeutic range <60%</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_L" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>E</span>lderly</div>
+                            <span class="calc-sublabel">Age > 65 years</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_E" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>D</span>rugs</div>
+                            <span class="calc-sublabel">Prior antiplatelet (e.g. aspirin) or NSAID usage</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_D1" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label"><span>D</span>rugs (Alcohol)</div>
+                            <span class="calc-sublabel">Alcohol excess (≥ 8 drinks/week)</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="check_D2" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                </div>
+
+                <div class="result-box" id="resultBox">
+                    <div class="score-display" id="scoreDisplay">0</div>
+                    <div class="risk-text" id="riskText">Bleeding Risk: ~1.13% / year</div>
+                    <div class="risk-badge" id="riskBadge">Low Risk</div>
+                    <p style="margin-top: 15px; font-size: 0.95rem;" id="recommendationText">
+                        Anticoagulation should be considered.
+                    </p>
+                </div>
+                
+                <div style="font-size: 0.8rem; text-align: center; margin-top: 15px; color: var(--text-muted);">
+                    Ref: Pisters R et al. Chest 2010.
+                </div>
+
+                <div class="accordion-section">
+                    <button class="accordion">Pearls & Pitfalls</button>
+                    <div class="panel">
+                        <ul>
+                            <li><strong>Guideline Recommendations:</strong> Despite its popularity, neither the European nor the American guidelines recommend any specific risk score for predicting bleeding events in patients with AF.</li>
+                            <li><strong>Derivation Cohort:</strong> The derivation study was based on a cohort in which only around 2/3 were on any antithrombotic therapy. The score has since been validated extensively.</li>
+                            <li><strong>Risk Overlap:</strong> Clinical factors that contribute to stroke risk and support anticoagulation in patients with atrial fibrillation are frequently risk factors for bleeding as well.</li>
+                            <li><strong>DOACs:</strong> There may be superior predictive scores for bleeding events in patients taking direct oral anticoagulants, e.g., the DOAC Score.</li>
+                            <li><strong>High Risk Conditions:</strong> Use this score with caution in patients with conditions that are associated with elevated bleeding risks, including but not limited to chronic kidney disease and cancer – this score has been shown to perform poorly in both of these conditions.</li>
+                            <li><strong>Major Bleeding Definition:</strong> Defined in the study as intracranial hemorrhage, bleeding requiring hospitalization, bleeding with hemoglobin decrease >2 g/L, or bleeding requiring transfusion.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Accordion Logic
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    }
+
+    function calculateScore() {
+        let score = 0;
+        
+        // Sum all checkboxes (each worth 1 point)
+        if (document.getElementById('check_H').checked) score += 1;
+        if (document.getElementById('check_A1').checked) score += 1;
+        if (document.getElementById('check_A2').checked) score += 1;
+        if (document.getElementById('check_S').checked) score += 1;
+        if (document.getElementById('check_B').checked) score += 1;
+        if (document.getElementById('check_L').checked) score += 1;
+        if (document.getElementById('check_E').checked) score += 1;
+        if (document.getElementById('check_D1').checked) score += 1;
+        if (document.getElementById('check_D2').checked) score += 1;
+
+        updateUI(score);
+    }
+
+    function updateUI(score) {
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const riskText = document.getElementById('riskText');
+        const riskBadge = document.getElementById('riskBadge');
+        const recText = document.getElementById('recommendationText');
+        
+        scoreDisplay.textContent = score;
+
+        // Risk Data (Pisters et al. Chest 2010)
+        // Risks are approximate bleeds per 100 patient-years
+        const riskData = {
+            0: "1.13%",
+            1: "1.02%",
+            2: "1.88%",
+            3: "3.74%",
+            4: "8.70%",
+            5: "12.50%"
+        };
+
+        // For scores > 5, risk is usually extrapolated as >12.5% or just "High"
+        const riskPercentage = riskData[score] || ">12.5%";
+        riskText.textContent = `Bleeding Risk: ~${riskPercentage} / year`;
+
+        // Clinical Interpretation
+        let riskLevel = 'low';
+        let badgeText = 'Low Risk';
+        let advice = "Anticoagulation should be considered; bleeding risk is relatively low.";
+
+        if (score >= 3) {
+            riskLevel = 'high';
+            badgeText = 'High Risk';
+            advice = "High risk for major bleeding. Alternatives to anticoagulation or more frequent monitoring should be considered. Reassess modifiable risk factors (BP, INR, Alcohol, NSAIDs).";
+        } else if (score === 2) {
+            riskLevel = 'mod';
+            badgeText = 'Moderate Risk';
+            advice = "Moderate risk. Caution and regular review recommended when prescribing antithrombotics.";
+        }
+
+        riskBadge.textContent = badgeText;
+        recText.textContent = advice;
+        setResultStyle(riskLevel);
+    }
+
+    function setResultStyle(level) {
+        const box = document.getElementById('resultBox');
+        const badge = document.getElementById('riskBadge');
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+        const display = document.getElementById('scoreDisplay');
+
+        if (level === 'low') {
+            box.style.borderColor = style.getPropertyValue('--risk-low');
+            box.style.backgroundColor = style.getPropertyValue('--risk-low-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-low');
+            display.style.color = style.getPropertyValue('--risk-low');
+        } else if (level === 'mod') {
+            box.style.borderColor = style.getPropertyValue('--risk-mod');
+            box.style.backgroundColor = style.getPropertyValue('--risk-mod-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-mod');
+            display.style.color = style.getPropertyValue('--risk-mod');
+        } else {
+            box.style.borderColor = style.getPropertyValue('--risk-high');
+            box.style.backgroundColor = style.getPropertyValue('--risk-high-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-high');
+            display.style.color = style.getPropertyValue('--risk-high');
+        }
+        badge.style.color = '#fff';
+    }
+
+    // Dark Mode Integration
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        document.getElementById('darkModeIcon').textContent = isDark ? '☀️' : '🌙';
+        calculateScore(); 
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+        const darkMode = localStorage.getItem('darkMode');
+        if (darkMode === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+        }
+        calculateScore(); 
+    });
+
+</script>
+
+</body>
+</html>
