@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CHA₂DS₂-VASc Calculator | Tom Harrysson</title>
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <meta name="description" content="Interactive CHA₂DS₂-VASc Score for Atrial Fibrillation Stroke Risk">
+    <meta name="author" content="Tom Harrysson">
+
+    <style>
+        :root {
+            /* Inherited Theme Variables */
+            --bg-gradient-start: #e2e8f0;
+            --bg-gradient-mid: #cbd5e1;
+            --bg-gradient-end: #94a3b8;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --header-overlay: rgba(30, 41, 59, 0.85);
+            --header-content-bg: rgba(255, 255, 255, 0.98);
+            --header-content-text: #1e293b;
+            --section-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --accent-primary: #0891b2;
+            --accent-secondary: #06b6d4;
+            --link-color: #0891b2;
+            
+            /* Calculator Specifics */
+            --calc-item-bg: #ffffff;
+            --calc-highlight: #ecfeff;
+            --risk-low: #166534;
+            --risk-low-bg: #dcfce7;
+            --risk-mod: #854d0e;
+            --risk-mod-bg: #fef9c3;
+            --risk-high: #991b1b;
+            --risk-high-bg: #fee2e2;
+            --info-box-bg: #eff6ff;
+            --info-box-border: #bfdbfe;
+            
+            /* New Advice Vars */
+            --advice-bg: #f0fdf4;
+            --advice-border: #bbf7d0;
+            --critical-bg: #fff1f2;
+            --critical-border: #fecdd3;
+            --critical-text: #be123c;
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-mid: #1e293b;
+            --bg-gradient-end: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --card-bg: rgba(51, 65, 85, 0.95);
+            --header-overlay: rgba(15, 23, 42, 0.95);
+            --header-content-bg: rgba(51, 65, 85, 0.98);
+            --header-content-text: #f8fafc;
+            --section-bg: #475569;
+            --border-color: #64748b;
+            --accent-primary: #06b6d4;
+            --accent-secondary: #22d3ee;
+            --link-color: #22d3ee;
+            
+            --calc-item-bg: #334155;
+            --calc-highlight: #1e293b;
+            --risk-low: #86efac;
+            --risk-low-bg: #14532d;
+            --risk-mod: #fde047;
+            --risk-mod-bg: #422006;
+            --risk-high: #fca5a5;
+            --risk-high-bg: #450a0a;
+            --info-box-bg: #1e3a8a;
+            --info-box-border: #1d4ed8;
+            
+            --advice-bg: #064e3b;
+            --advice-border: #065f46;
+            --critical-bg: #881337;
+            --critical-border: #9f1239;
+            --critical-text: #fecdd3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            padding: 40px 20px;
+            background: linear-gradient(var(--header-overlay), var(--header-overlay));
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: sans-serif;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .back-button:hover { opacity: 1; text-decoration: underline; }
+
+        .content { padding: 30px; }
+
+        /* Usage Disclaimer Box */
+        .usage-box {
+            background: var(--info-box-bg);
+            border: 1px solid var(--info-box-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        .usage-box strong { color: var(--accent-primary); }
+
+        /* Calculator Styles */
+        .calc-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .calc-item {
+            background: var(--calc-item-bg);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-item:hover {
+            border-color: var(--accent-primary);
+            background: var(--calc-highlight);
+        }
+
+        .calc-label {
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+        
+        .calc-sublabel {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-primary); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--accent-primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Radio Group */
+        .radio-group { display: flex; gap: 10px; }
+        .radio-label {
+            background: var(--section-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .radio-label:hover { border-color: var(--accent-primary); }
+        input[type="radio"] { display: none; }
+        input[type="radio"]:checked + .radio-label {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        /* Results Box */
+        .result-box {
+            margin-top: 30px;
+            background: var(--section-bg);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 15px;
+            color: var(--accent-primary);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stat-item {
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .stat-val { font-weight: 700; font-size: 1.2rem; color: var(--text-primary); }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.3; margin-top: 4px;}
+
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Pearls Accordion */
+        .accordion-section { margin-top: 30px; }
+        .accordion {
+            background-color: var(--section-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+        .accordion:hover { background-color: var(--border-color); }
+        .accordion:after {
+            content: '\002B';
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .active:after { content: "\2212"; }
+        
+        .panel {
+            padding: 0 18px;
+            background-color: var(--card-bg);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-radius: 0 0 12px 12px;
+        }
+        .panel ul {
+            padding: 20px;
+            padding-left: 20px;
+            list-style-type: disc;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        .panel li { margin-bottom: 12px; }
+
+        /* Advice / Next Steps Section */
+        .advice-container {
+            margin-top: 30px;
+            background: var(--advice-bg);
+            border: 1px solid var(--advice-border);
+            border-radius: 12px;
+            padding: 25px;
+            font-size: 0.95rem;
+        }
+        .advice-header {
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--risk-low);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--advice-border);
+            padding-bottom: 10px;
+        }
+        .sub-header {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .advice-list { padding-left: 20px; margin-bottom: 15px; }
+        .advice-list li { margin-bottom: 8px; color: var(--text-primary); }
+
+        .critical-box {
+            background: var(--critical-bg);
+            border: 1px solid var(--critical-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .critical-title {
+            color: var(--critical-text);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .critical-text {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Footer / Credits */
+        .credits {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        .credits a { color: var(--link-color); text-decoration: none; }
+        .credits a:hover { text-decoration: underline; }
+
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <a href="tools.html" class="back-button">← Tools</a>
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                    <span id="darkModeIcon">🌙</span>
+                </button>
+                <h1>CHA₂DS₂-VASc Calculator</h1>
+                <p style="opacity: 0.9;">Atrial Fibrillation Stroke Risk</p>
+            </div>
+
+            <div class="content">
+                
+                <div class="usage-box">
+                    <p style="margin-bottom: 10px;">
+                        <strong>When to Use:</strong> One of several risk stratification schemata that can help determine the one-year risk of a thromboembolic (TE) event in a non-anticoagulated patient with <strong>non-valvular atrial fibrillation (AF)</strong> without any history of valvular surgery.
+                    </p>
+                    <p>
+                        Can be used in discussions with patients to facilitate shared decision-making regarding their risk for TE events.
+                    </p>
+                </div>
+
+                <div class="calc-grid">
+                    
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">Congestive Heart Failure</div>
+                            <span class="calc-sublabel">Or Left Ventricular Dysfunction</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="c_chf" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">Hypertension</div>
+                            <span class="calc-sublabel">Uncontrolled or treated</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="h_htn" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <div class="calc-item" style="cursor: default;">
+                        <div class="calc-label">Age</div>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="age" value="0" checked onchange="calculateScore()">
+                                <span class="radio-label">&lt; 65</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="age" value="1" onchange="calculateScore()">
+                                <span class="radio-label">65-74</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="age" value="2" onchange="calculateScore()">
+                                <span class="radio-label">≥ 75</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <label class="calc-item">
+                        <div class="calc-label">Diabetes Mellitus</div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="d_dm" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">Stroke / TIA</div>
+                            <span class="calc-sublabel">History of Stroke, TIA, or Thromboembolism</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="s_stroke" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <div>
+                            <div class="calc-label">Vascular Disease</div>
+                            <span class="calc-sublabel">Prior MI, PAD, or Aortic Plaque</span>
+                        </div>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="v_vasc" onchange="calculateScore()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <div class="calc-item" style="cursor: default;">
+                        <div class="calc-label">Sex Category</div>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="sex" value="0" checked onchange="calculateScore()">
+                                <span class="radio-label">Male</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="sex" value="1" onchange="calculateScore()">
+                                <span class="radio-label">Female</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="result-box" id="resultBox">
+                    <div class="score-display" id="scoreDisplay">0</div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-val" id="riskStroke">0.2%</div>
+                            <div class="stat-label">Stroke Risk<br>(Annual)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-val" id="riskCombined">0.3%</div>
+                            <div class="stat-label">Stroke / TIA /<br>Systemic Embolism</div>
+                        </div>
+                    </div>
+
+                    <div class="risk-badge" id="riskBadge">Low Risk</div>
+                    <p style="margin-top: 15px; font-size: 0.95rem;" id="recommendationText">
+                        Oral anticoagulation is generally not recommended.
+                    </p>
+                </div>
+
+                <div class="accordion-section">
+                    <button class="accordion">Pearls & Pitfalls</button>
+                    <div class="panel">
+                        <ul>
+                            <li>Of the 1577 patients that fulfilled the inclusion criteria, outcome information was missing for 31%, who were excluded from the analysis. These patients could have had TE events, causing them to be lost to follow-up.</li>
+                            <li>Although the derivation study found no statistically significant difference between the CHA₂DS₂-VASc and CHADS₂ risk stratification schemata in predicting TE events, subsequent validation studies (e.g., Friberg 2012 and Olesen 2011) have found CHA₂DS₂-VASc to be significantly superior to CHADS₂ in performance. CHA₂DS₂-VASc has also demonstrated very high negative predictive values in multiple validation studies.</li>
+                            <li>None of the included patients were anticoagulated. Those at particularly high risk for a TE event may have been already anticoagulated by their primary care physician, potentially skewing the TE rates.</li>
+                            <li>A subsequent study identified CAD and smoking as potential additional risk factors for TE. However, that study did not show a statistical difference in the predictive risk stratification abilities of the scores.</li>
+                            <li>Subsequent research suggests that the only "truly low risk" (i.e., 1-year risk of TE &lt;1%) patients are males with a score of 0, or females with a score of 1, and that the default position should be one of anticoagulation.</li>
+                            <li>The risks of paroxysmal AF and permanent AF are similar, and anticoagulation decisions should not be based on whether AF is permanent or paroxysmal.</li>
+                            <li>For patients with hypertrophic cardiomyopathy or cardiac amyloidosis, the 2024 European Society of Cardiology guidelines do not recommend basing stroke prevention strategies on the CHA₂DS₂-VASc Score.</li>
+                            <li>Presence of other thrombotic risk factors (e.g., impaired renal function) may adversely impact the performance of this score. Interpretation of this score in such patients should be made with caution and with consideration of individual clinical contexts.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="advice-container">
+                    <div class="advice-header">Advice & Next Steps</div>
+                    
+                    <p style="margin-bottom: 15px;">
+                        Recent guidelines emphasize the strong evidence of benefit with anticoagulation and the lack of benefit from antiplatelet treatment. 
+                        There has been recent work suggesting that sex as a risk factor should be removed from CHA₂DS₂-VASc.
+                    </p>
+
+                    <span class="sub-header">Management</span>
+                    <ul class="advice-list">
+                        <li><strong>Scores of 0 (Men) or 1 (Women):</strong> Anticoagulation is generally not recommended as these patients had no TE events in the original study.</li>
+                        <li><strong>Scores of 1 (Men) or 2 (Women):</strong> Anticoagulation can be considered depending on patient preference and individual risk factors.</li>
+                        <li><strong>Scores of ≥2 (Men) or ≥3 (Women):</strong> Anticoagulation should be started, preferably with a direct oral anticoagulant (DOAC) unless contraindicated.</li>
+                        <li>Aspirin monotherapy is <strong>not supported</strong> by current evidence.</li>
+                        <li>Bleeding risk scores (e.g., ATRIA, HAS-BLED) can be used to determine hemorrhage risk, but should primarily serve as a reminder to address reversible risk factors. The risk-benefit ratio of anticoagulation usually remains favorable.</li>
+                    </ul>
+
+                    <div class="critical-box">
+                        <span class="critical-title">Critical Actions</span>
+                        <p class="critical-text">
+                            Before initiating anticoagulation, assess the patient’s bleeding risk using validated tools (e.g., <a href="hasbled.html" style="color: inherit; text-decoration: underline;">HAS-BLED</a>) and consider concomitant risk factors for bleeding. Weigh the risks and benefits carefully, and discuss them thoroughly with the patient for shared decision-making.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="credits">
+                    <p>
+                        Clinical logic and text content adapted from <a href="https://www.mdcalc.com/calc/801/cha2ds2-vasc-score-atrial-fibrillation-stroke-risk" target="_blank" rel="noopener">MDCalc</a>.<br>
+                        MDCalc © 2005–2025. Used for educational purposes.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Accordion Logic
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    }
+
+    function calculateScore() {
+        let score = 0;
+
+        // 1. Congestive Heart Failure (+1)
+        if (document.getElementById('c_chf').checked) score += 1;
+
+        // 2. Hypertension (+1)
+        if (document.getElementById('h_htn').checked) score += 1;
+
+        // 3. Age (+1 for 65-74, +2 for >=75)
+        const ageVal = document.querySelector('input[name="age"]:checked').value;
+        score += parseInt(ageVal);
+
+        // 4. Diabetes (+1)
+        if (document.getElementById('d_dm').checked) score += 1;
+
+        // 5. Stroke/TIA (+2)
+        if (document.getElementById('s_stroke').checked) score += 2;
+
+        // 6. Vascular Disease (+1)
+        if (document.getElementById('v_vasc').checked) score += 1;
+
+        // 7. Sex (+1 for Female)
+        const sexVal = document.querySelector('input[name="sex"]:checked').value;
+        score += parseInt(sexVal);
+
+        updateUI(score);
+    }
+
+    function updateUI(score) {
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const riskStroke = document.getElementById('riskStroke');
+        const riskCombined = document.getElementById('riskCombined');
+        const riskBadge = document.getElementById('riskBadge');
+        const recText = document.getElementById('recommendationText');
+        
+        scoreDisplay.textContent = score;
+
+        // Friberg 2012 Data
+        const riskData = {
+            0: { stroke: "0.2%", combined: "0.3%" },
+            1: { stroke: "0.6%", combined: "0.9%" },
+            2: { stroke: "2.2%", combined: "2.9%" },
+            3: { stroke: "3.2%", combined: "4.6%" },
+            4: { stroke: "4.8%", combined: "6.7%" },
+            5: { stroke: "7.2%", combined: "10.0%" },
+            6: { stroke: "9.7%", combined: "13.6%" },
+            7: { stroke: "11.2%", combined: "15.7%" },
+            8: { stroke: "10.8%", combined: "15.2%" },
+            9: { stroke: "12.2%", combined: "17.4%" }
+        };
+
+        const data = riskData[score] || { stroke: ">12%", combined: ">17%" };
+        
+        riskStroke.textContent = data.stroke;
+        riskCombined.textContent = data.combined;
+
+        // Clinical Logic (ESC Guidelines)
+        const isFemale = document.querySelector('input[name="sex"]:checked').value === "1";
+        
+        let riskLevel = 'low';
+        let badgeText = 'Low Risk';
+        let advice = "No antithrombotic therapy recommended.";
+
+        if (isFemale) {
+            if (score >= 3) {
+                riskLevel = 'high';
+                badgeText = 'High Risk';
+                advice = "Oral anticoagulation (OAC) is strongly recommended (Class I).";
+            } else if (score === 2) {
+                riskLevel = 'mod';
+                badgeText = 'Moderate Risk';
+                advice = "Oral anticoagulation should be considered (Class IIa).";
+            } else {
+                // Score 1 (just female sex)
+                riskLevel = 'low';
+                badgeText = 'Low Risk';
+                advice = "No antithrombotic therapy recommended (Sex category alone does not trigger treatment).";
+            }
+        } else {
+            // Male logic
+            if (score >= 2) {
+                riskLevel = 'high';
+                badgeText = 'High Risk';
+                advice = "Oral anticoagulation (OAC) is strongly recommended (Class I).";
+            } else if (score === 1) {
+                riskLevel = 'mod';
+                badgeText = 'Moderate Risk';
+                advice = "Oral anticoagulation should be considered (Class IIa).";
+            } else {
+                riskLevel = 'low';
+                badgeText = 'Low Risk';
+                advice = "No antithrombotic therapy recommended.";
+            }
+        }
+
+        riskBadge.textContent = badgeText;
+        recText.textContent = advice;
+        setResultStyle(riskLevel);
+    }
+
+    function setResultStyle(level) {
+        const box = document.getElementById('resultBox');
+        const badge = document.getElementById('riskBadge');
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+        const display = document.getElementById('scoreDisplay');
+
+        if (level === 'low') {
+            box.style.borderColor = style.getPropertyValue('--risk-low');
+            box.style.backgroundColor = style.getPropertyValue('--risk-low-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-low');
+            display.style.color = style.getPropertyValue('--risk-low');
+        } else if (level === 'mod') {
+            box.style.borderColor = style.getPropertyValue('--risk-mod');
+            box.style.backgroundColor = style.getPropertyValue('--risk-mod-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-mod');
+            display.style.color = style.getPropertyValue('--risk-mod');
+        } else {
+            box.style.borderColor = style.getPropertyValue('--risk-high');
+            box.style.backgroundColor = style.getPropertyValue('--risk-high-bg');
+            badge.style.backgroundColor = style.getPropertyValue('--risk-high');
+            display.style.color = style.getPropertyValue('--risk-high');
+        }
+        badge.style.color = '#fff';
+    }
+
+    // Dark Mode Integration
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        document.getElementById('darkModeIcon').textContent = isDark ? '☀️' : '🌙';
+        calculateScore(); 
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+        const darkMode = localStorage.getItem('darkMode');
+        if (darkMode === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeIcon').textContent = '☀️';
+        }
+        calculateScore(); 
+    });
+
+</script>
+
+</body>
+</html>
