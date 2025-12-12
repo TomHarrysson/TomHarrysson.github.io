@@ -128,6 +128,14 @@
             color: var(--text-primary);
         }
         .usage-box strong { color: var(--accent-primary); }
+        
+        /* Inline Links */
+        .inline-link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .inline-link:hover { text-decoration: underline; }
 
         /* Calculator Styles */
         .calc-grid {
@@ -255,11 +263,11 @@
         }
         .accordion:hover { background-color: var(--border-color); }
         .accordion:after {
-            content: '\002B'; /* Plus sign */
+            content: '\002B';
             font-size: 1.5rem;
             font-weight: bold;
         }
-        .active:after { content: "\2212"; /* Minus sign */ }
+        .active:after { content: "\2212"; }
         
         .panel {
             padding: 0 18px;
@@ -277,6 +285,18 @@
             color: var(--text-secondary);
         }
         .panel li { margin-bottom: 12px; }
+
+        /* Credits */
+        .credits {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        .credits a { color: var(--link-color); text-decoration: none; }
+        .credits a:hover { text-decoration: underline; }
 
         /* Dark Mode Toggle */
         .dark-mode-toggle {
@@ -312,14 +332,16 @@
             </div>
 
             <div class="content">
-                
+
                 <div class="usage-box">
                     <p style="margin-bottom: 10px;">
-                        <strong>When to Use:</strong> Developed as a practical risk score to estimate the 1-year risk for major bleeding in patients with atrial fibrillation.
+                        <strong>When to Use:</strong>
                     </p>
-                    <p>
-                        <strong>Population:</strong> Ambulatory and hospitalized patients with AF without mitral valve stenosis or valvular surgery.
-                    </p>
+                    <ul style="padding-left: 20px; margin-bottom: 0;">
+                        <li style="margin-bottom: 8px;">Consider using the HAS-BLED Score as a reference tool to assist in the shared decision-making discussion regarding anticoagulation in patients with atrial fibrillation.</li>
+                        <li style="margin-bottom: 8px;">Consider using the HAS-BLED Score instead of, or in conjunction with, other bleeding risk scores such as HEMORR₂HAGES and ATRIA to determine risk of major bleeding in a patient with atrial fibrillation.</li>
+                        <li>Consider comparing the risk for major bleeding as calculated by the HAS-BLED Score to the risk for thromboembolic events by the <a href="chadsvasc.html" class="inline-link">CHA₂DS₂-VASc</a> to determine if the benefit of anticoagulation outweighs the risk.</li>
+                    </ul>
                 </div>
 
                 <div class="calc-grid">
@@ -441,15 +463,25 @@
                 <div class="accordion-section">
                     <button class="accordion">Pearls & Pitfalls</button>
                     <div class="panel">
-                        <ul>
+                        <ul style="margin-top: 0;">
+                            <li><strong>Background:</strong> The HAS-BLED Score was developed as a practical risk score to estimate the 1-year risk for major bleeding in patients with atrial fibrillation.</li>
+                            <li><strong>Study Derivation:</strong> Included 3456 ambulatory and hospitalized patients with AF and one-year follow-up status regarding major bleeding, and without mitral valve stenosis or valvular surgery.</li>
+                            <li><strong>Outcome:</strong> Patients were followed up at one year to determine survival and major adverse cardiovascular events, such as major bleeding. Results showed that the annual bleeding rate increased with increasing scores.</li>
+                            <li><strong>Major Bleeding Definition:</strong> Defined as intracranial hemorrhage, bleeding requiring hospitalization, bleeding with hemoglobin decrease >2 g/L, or bleeding requiring transfusion.</li>
                             <li><strong>Guideline Recommendations:</strong> Despite its popularity, neither the European nor the American guidelines recommend any specific risk score for predicting bleeding events in patients with AF.</li>
                             <li><strong>Derivation Cohort:</strong> The derivation study was based on a cohort in which only around 2/3 were on any antithrombotic therapy. The score has since been validated extensively.</li>
                             <li><strong>Risk Overlap:</strong> Clinical factors that contribute to stroke risk and support anticoagulation in patients with atrial fibrillation are frequently risk factors for bleeding as well.</li>
-                            <li><strong>DOACs:</strong> There may be superior predictive scores for bleeding events in patients taking direct oral anticoagulants, e.g., the DOAC Score.</li>
+                            <li><strong>DOACs:</strong> There may be superior predictive scores for bleeding events in patients taking direct oral anticoagulants, e.g., the <a href="doac-score.html" class="inline-link">DOAC Score</a>.</li>
                             <li><strong>High Risk Conditions:</strong> Use this score with caution in patients with conditions that are associated with elevated bleeding risks, including but not limited to chronic kidney disease and cancer – this score has been shown to perform poorly in both of these conditions.</li>
-                            <li><strong>Major Bleeding Definition:</strong> Defined in the study as intracranial hemorrhage, bleeding requiring hospitalization, bleeding with hemoglobin decrease >2 g/L, or bleeding requiring transfusion.</li>
                         </ul>
                     </div>
+                </div>
+
+                <div class="credits">
+                    <p>
+                        Clinical logic and text content adapted from <a href="https://www.mdcalc.com/calc/807/has-bled-score-major-bleeding-risk" target="_blank" rel="noopener">MDCalc</a>.<br>
+                        MDCalc © 2005–2025. Used for educational purposes.
+                    </p>
                 </div>
 
             </div>
