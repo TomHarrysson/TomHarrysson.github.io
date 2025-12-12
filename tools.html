@@ -7,7 +7,7 @@
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-    <meta name="description" content="Fun games and useful tools - Tom's experimental playground">
+    <meta name="description" content="Medical calculators, study tools, and games - Tom's experimental playground">
     <meta name="author" content="Tom Harrysson">
 
     <style>
@@ -138,16 +138,18 @@
             font-size: 1.8rem;
             color: var(--header-content-text);
             margin-bottom: 30px;
+            margin-top: 40px;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--accent-primary);
             transition: color 0.3s ease, border-color 0.3s ease;
         }
+        .section-title:first-of-type { margin-top: 0; }
 
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         .game-card {
@@ -172,6 +174,9 @@
 
         .status-available { background: #dcfce7; color: #166534; }
         body.dark-mode .status-available { background: #14532d; color: #86efac; }
+        
+        .status-beta { background: #fef9c3; color: #854d0e; }
+        body.dark-mode .status-beta { background: #422006; color: #fde047; }
 
         .intro-text { background: var(--section-bg); padding: 25px; border-radius: 12px; margin-bottom: 40px; text-align: center; }
         .intro-text h3 { color: var(--header-content-text); margin-bottom: 10px; }
@@ -202,11 +207,72 @@
             <div class="content">
                 <div class="intro-text">
                     <h3>Welcome to my tinkering space!</h3>
-                    <p>This is where I experiment with web development, build simple games, and create useful tools. Check back regularly for new additions!</p>
+                    <p>This is where I experiment with web development, build clinical utilities, and create useful study aids. Check back regularly for new additions!</p>
+                </div>
+
+                <h2 class="section-title">🧮 Clinical Calculators</h2>
+                <div class="games-grid">
+                    <a href="chadsvasc.html" class="game-card">
+                        <span class="game-icon">❤️</span>
+                        <h3 class="game-title">CHA₂DS₂-VASc Score</h3>
+                        <p class="game-description">Atrial Fibrillation Stroke Risk Calculator. Includes ESC guideline recommendations and Friberg risk data.</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+
+                    <a href="hasbled.html" class="game-card">
+                        <span class="game-icon">🩸</span>
+                        <h3 class="game-title">HAS-BLED Score</h3>
+                        <p class="game-description">Major Bleeding Risk Calculator for patients with Atrial Fibrillation. Estimate 1-year bleeding risk.</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+
+                    <a href="doac-score.html" class="game-card">
+                        <span class="game-icon">💊</span>
+                        <h3 class="game-title">DOAC Score</h3>
+                        <p class="game-description">Predict bleeding events in AF patients specifically on Direct-Acting Oral Anticoagulants.</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+                </div>
+
+                <h2 class="section-title">📚 Study Tools</h2>
+                <div class="games-grid">
+                    <a href="mcq-generator.html" class="game-card">
+                        <span class="game-icon">🎯</span>
+                        <h3 class="game-title">MCQ Quiz Tool</h3>
+                        <p class="game-description">Paste JSON from ChatGPT and take interactive quizzes. Generate questions with AI and test yourself!</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+
+                    <a href="short-answer-quiz.html" class="game-card">
+                        <span class="game-icon">📝</span>
+                        <h3 class="game-title">Short Answer Quiz Tool</h3>
+                        <p class="game-description">Practice with short answer questions including illness scripts and multi-part clinical scenarios.</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+
+                    <a href="pomodoro.html" class="game-card">
+                        <span class="game-icon">🍅</span>
+                        <h3 class="game-title">Pomodoro Timer</h3>
+                        <p class="game-description">Stay focused with timed study sessions. Perfect for intensive revision!</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+
+                    <a href="flashcards.html" class="game-card">
+                        <span class="game-icon">🗂️</span>
+                        <h3 class="game-title">Flashcard Generator</h3>
+                        <p class="game-description">Create and practice with custom medical flashcards. Perfect for studying!</p>
+                        <span class="game-status status-available">Use Now</span>
+                    </a>
+
+                    <a href="anatomical_variants.html" class="game-card" title="Open anatomical variants reference">
+                        <span class="game-icon">🧬</span>
+                        <h3 class="game-title">Anatomical Variants Reference</h3>
+                        <p class="game-description">Explore clinically relevant anatomical variations by system — Circle of Willis, coronary arteries, and more.</p>
+                        <span class="game-status status-available">View Now</span>
+                    </a>
                 </div>
 
                 <h2 class="section-title">🎮 Games</h2>
-
                 <div class="games-grid">
                     <a href="medical-wordle.html" class="game-card">
                         <span class="game-icon">🏥</span>
@@ -220,45 +286,6 @@
                         <h3 class="game-title">Classic Pong</h3>
                         <p class="game-description">The classic arcade game! Use arrow keys to control your paddle.</p>
                         <span class="game-status status-available">Play Now</span>
-                    </a>
-                </div>
-
-                <h2 class="section-title">🛠️ Tools</h2>
-
-                <div class="games-grid">
-                    <a href="mcq-generator.html" class="game-card">
-                        <span class="game-icon">🎯</span>
-                        <h3 class="game-title">MCQ Quiz Tool</h3>
-                        <p class="game-description">Paste JSON from ChatGPT and take interactive quizzes. Generate questions with AI and test yourself!</p>
-                        <span class="game-status status-available">Use Now</span>
-                    </a>
-
-                    <a href="short-answer-quiz.html" class="game-card">
-                        <span class="game-icon">📝</span>
-                        <h3 class="game-title">Short Answer Quiz Tool</h3>
-                        <p class="game-description">Practice with short answer questions including illness scripts and multi-part clinical scenarios. Perfect for deep learning!</p>
-                        <span class="game-status status-available">Use Now</span>
-                    </a>
-
-                    <a href="pomodoro.html" class="game-card">
-                        <span class="game-icon">🍅</span>
-                        <h3 class="game-title">Pomodoro Timer</h3>
-                        <p class="game-description">Stay focused with timed study sessions. Perfect for intensive revision!</p>
-                        <span class="game-status status-available">Use Now</span>
-                    </a>
-
-                    <a href="flashcards.html" class="game-card">
-                        <span class="game-icon">📚</span>
-                        <h3 class="game-title">Flashcard Generator</h3>
-                        <p class="game-description">Create and practice with custom medical flashcards. Perfect for studying!</p>
-                        <span class="game-status status-available">Use Now</span>
-                    </a>
-
-                    <a href="anatomical_variants.html" class="game-card" title="Open anatomical variants reference">
-                        <span class="game-icon">🧬</span>
-                        <h3 class="game-title">Anatomical Variants Reference</h3>
-                        <p class="game-description">Explore clinically relevant anatomical variations by system — Circle of Willis, coronary arteries, pulmonary veins, and more.</p>
-                        <span class="game-status status-available">View Now</span>
                     </a>
                 </div>
 
